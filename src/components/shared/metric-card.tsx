@@ -17,14 +17,14 @@ type MetricCardProps = {
   value: string
   valueTone?: keyof typeof toneClasses
   variation?: number | null
-  variationTone?: 'higherIsBetter' | 'lowerIsBetter'
+  variationTone?: 'higherIsBetter' | 'lowerIsBetter' | 'neutral'
 }
 
 export function MetricCard({
   title, icon: Icon, value, valueTone = 'neutral', variation, variationTone = 'higherIsBetter',
 }: MetricCardProps) {
   const { t } = useTranslation()
-  const effect = (variation ?? 0) * (variationTone === 'lowerIsBetter' ? -1 : 1)
+  const effect = variationTone === 'neutral' ? 0 : (variation ?? 0) * (variationTone === 'lowerIsBetter' ? -1 : 1)
   const comparisonTone = effect > 0 ? 'positive' : effect < 0 ? 'negative' : 'neutral'
 
   return (

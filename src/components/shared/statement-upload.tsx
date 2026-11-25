@@ -1,5 +1,5 @@
 import { UploadCloud } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,19 @@ export function StatementUpload({ onAccept }: { onAccept: () => void }) {
   const input = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
   const [invalid, setInvalid] = useState(false)
+
+  useEffect(() => {
+    function preventFileNavigation(event: DragEvent) {
+      if (event.dataTransfer?.types.includes('Files')) event.preventDefault()
+    }
+
+    window.addEventListener('dragover', preventFileNavigation)
+    window.addEventListener('drop', preventFileNavigation)
+    return () => {
+      window.removeEventListener('dragover', preventFileNavigation)
+      window.removeEventListener('drop', preventFileNavigation)
+    }
+  }, [])
 
   function handleFiles(files: FileList | null) {
     if (!files?.length) return

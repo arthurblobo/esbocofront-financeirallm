@@ -1,8 +1,9 @@
+import type { TFunction } from 'i18next'
 import { useSyncExternalStore } from 'react'
 
-import { defaultCategories, UNCATEGORIZED_ID, type Category, type CategoryId } from '@/mocks/categories'
+import { defaultCategories, getCategoryLabel, UNCATEGORIZED_ID, type Category, type CategoryId } from '@/mocks/categories'
 import { createTransactions, type Transaction } from '@/mocks/transactions'
-import { categoryColors } from './category-palette'
+import { categoryColors, categoryPalette } from './category-palette'
 import { parseLocalDate, toLocalDateKey } from './dates'
 import { readStorage, subscribeStorage, writeStorage } from './storage'
 
@@ -47,23 +48,33 @@ function createStoredData<T>(key: string, fallback: T, parse: (value: unknown) =
   return { getSnapshot, save, subscribe }
 }
 
-function isCategory(value: unknown): value is Category {
-  if (
-    !value || typeof value !== 'object' ||
-    !('id' in value) || typeof value.id !== 'string' || !value.id ||
-    !('color' in value) || typeof value.color !== 'string' || !categoryColors.includes(value.color)
-  ) return false
+function parseCategories(value: unknown): readonly Category[] {
+  if (!Array.isArray(value)) return defaultCategories
 
-  const name = 'name' in value ? value.name : undefined
-  const labelKey = 'labelKey' in value ? value.labelKey : undefined
-  if (labelKey === undefined) return typeof name === 'string' && name.trim().length > 0
-  return (name === undefined || (typeof name === 'string' && name.trim().length > 0)) &&
-    defaultCategories.some((category) => category.labelKey === labelKey)
+  const defaults = new Map(defaultCategories.map((category) => [category.id, category]))
+  const saved = new Map<CategoryId, Category>()
+  for (const item of value as unknown[]) {
+    if (!item || typeof item !== 'object' || !('id' in item) || typeof item.id !== 'string') continue
+
+    const id = item.id.trim()
+    if (!id || saved.has(id)) continue
+
+    const base = defaults.get(id)
+    const name = 'name' in item && typeof item.name === 'string' ? item.name.trim() : ''
+    const color = 'color' in item && typeof item.color === 'string' && categoryColors.includes(item.color)
+      ? item.color
+      : categoryPalette.slate
+    if (base) saved.set(id, name ? { ...base, name, color } : { ...base, color })
+    else if (name) saved.set(id, { id, name, color })
+  }
+
+  return [
+    ...defaultCategories.map((category) => saved.get(category.id) ?? category),
+    ...[...saved.values()].filter(({ id }) => !defaults.has(id)),
+  ]
 }
 
-const categories = createStoredData('categories', defaultCategories, (value) =>
-  Array.isArray(value) && value.every(isCategory) ? value : defaultCategories,
-)
+const categories = createStoredData('categories', defaultCategories, parseCategories)
 const imported = createStoredData<readonly string[]>('importedMonths', [], (value) =>
   Array.isArray(value) ? value.filter((month): month is string => typeof month === 'string' && /^\d{4}-\d{2}$/.test(month)) : [],
 )
@@ -88,6 +99,7 @@ let calendarSnapshot: StatementMonths | undefined
 let availableMonths: ReadonlySet<string> = new Set()
 let processingMonths: ReadonlySet<string> = new Set()
 const processingListeners = new Set<() => void>()
+const completedImports = new Set<string>()
 
 function getCalendar(): StatementMonths {
   const today = new Date()
@@ -144,19 +156,23 @@ export function useStatementMonths() {
 
 let transactionCalendar: StatementMonths | undefined
 let transactionAssignments: Readonly<Record<string, CategoryId>> | undefined
+let transactionCategories: readonly Category[] | undefined
 let transactionsSnapshot: readonly Transaction[] = []
 
 function getTransactionsSnapshot() {
   const calendar = getCalendar()
   const categoryAssignments = assignments.getSnapshot()
-  if (calendar !== transactionCalendar || categoryAssignments !== transactionAssignments) {
+  const currentCategories = categories.getSnapshot()
+  if (calendar !== transactionCalendar || categoryAssignments !== transactionAssignments || currentCategories !== transactionCategories) {
     transactionCalendar = calendar
     transactionAssignments = categoryAssignments
+    transactionCategories = currentCategories
+    const categoryIds = new Set(currentCategories.map(({ id }) => id))
     transactionsSnapshot = mockTransactions
       .filter(({ date }) => getStatementMonthStatus(calendar, date.slice(0, 7)) === 'imported')
       .map((transaction) => {
         const categoryId = categoryAssignments[transaction.id]
-        return transaction.type === 'expense' && categoryId ? { ...transaction, categoryId } : transaction
+        return transaction.type === 'expense' && categoryIds.has(categoryId) ? { ...transaction, categoryId } : transaction
       })
   }
   return transactionsSnapshot
@@ -165,9 +181,11 @@ function getTransactionsSnapshot() {
 function subscribeTransactions(listener: () => void) {
   const unsubscribeCalendar = subscribeCalendar(listener)
   const unsubscribeAssignments = assignments.subscribe(listener)
+  const unsubscribeCategories = categories.subscribe(listener)
   return () => {
     unsubscribeCalendar()
     unsubscribeAssignments()
+    unsubscribeCategories()
   }
 }
 
@@ -186,6 +204,7 @@ export function startStatementImport(month: string): boolean {
   processingListeners.forEach((listener) => listener())
   window.setTimeout(() => {
     processingMonths = new Set([...processingMonths].filter((value) => value !== month))
+    completedImports.add(month)
     const months = imported.getSnapshot()
     if (!months.includes(month)) imported.save([...months, month])
     else processingListeners.forEach((listener) => listener())
@@ -193,24 +212,46 @@ export function startStatementImport(month: string): boolean {
   return true
 }
 
-export function saveCategory(id: CategoryId | null, name: string | undefined, color: string): CategoryId | null {
-  const trimmedName = name?.trim()
-  if (trimmedName === '' || !categoryColors.includes(color)) return null
+export function consumeCompletedImports(): string[] {
+  const months = [...completedImports]
+  completedImports.clear()
+  return months
+}
 
+export type CategoryChanges = { name?: string; color?: string }
+type SaveCategoryResult = { ok: true; id: CategoryId } | { ok: false; reason: 'empty' | 'duplicate' }
+
+export function saveCategory(id: CategoryId | null, changes: CategoryChanges, t: TFunction): SaveCategoryResult {
+  const name = changes.name?.trim()
+  const color = changes.color === undefined || categoryColors.includes(changes.color) ? changes.color : categoryPalette.slate
   const current = categories.getSnapshot()
-  if (id === null) {
-    if (!trimmedName) return null
-    const newId = `custom-${crypto.randomUUID()}`
-    categories.save([...current, { id: newId, name: trimmedName, color }])
-    return newId
-  }
-  if (!current.some((category) => category.id === id)) return null
+  if (name === '' || (id === null && !name)) return { ok: false, reason: 'empty' }
 
-  categories.save(current.map((category) => {
-    if (category.id !== id) return category
-    return trimmedName === undefined ? { ...category, color } : { ...category, name: trimmedName, color }
-  }))
-  return id
+  const normalizedName = name?.toLocaleLowerCase()
+  if (normalizedName !== undefined && current.some((category) =>
+    category.id !== id && getCategoryLabel(category, t).trim().toLocaleLowerCase() === normalizedName,
+  )) return { ok: false, reason: 'duplicate' }
+
+  if (id === null) {
+    if (!name) return { ok: false, reason: 'empty' }
+    const newId = `custom-${crypto.randomUUID()}`
+    categories.save([...current, { id: newId, name, color: color ?? categoryPalette.slate }])
+    return { ok: true, id: newId }
+  }
+
+  if (!current.some((category) => category.id === id)) return { ok: false, reason: 'empty' }
+  if (name !== undefined || color !== undefined) {
+    categories.save(current.map((category) => {
+      if (category.id !== id) return category
+
+      const updated = { ...category, color: color ?? category.color }
+      if (name === undefined) return updated
+      if (updated.labelKey && name === t(updated.labelKey)) delete updated.name
+      else updated.name = name
+      return updated
+    }))
+  }
+  return { ok: true, id }
 }
 
 export function assignTransactionCategory(transactionId: string, categoryId: CategoryId): boolean {

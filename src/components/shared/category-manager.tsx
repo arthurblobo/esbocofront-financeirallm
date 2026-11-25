@@ -4,36 +4,52 @@ import { useTranslation } from 'react-i18next'
 
 import { FormField } from '@/components/shared/form-field'
 import { Button } from '@/components/ui/button'
-import { categoryPalette } from '@/lib/category-palette'
-import { getCategoryLabel, saveCategory, useCategories, type Category } from '@/lib/data'
+import { Select } from '@/components/ui/select'
+import { categoryColors, categoryPalette } from '@/lib/category-palette'
+import { getCategoryLabel, saveCategory, useCategories, type Category, type CategoryChanges } from '@/lib/data'
 
 const swatches = Object.entries(categoryPalette) as [keyof typeof categoryPalette, string][]
 
-function CategoryForm({ category, onSave }: { category?: Category; onSave: (id: string) => void }) {
+type CategoryFormProps = { category?: Category; newColor: string; onEdit: () => void; onSave: (id: string) => void }
+
+function CategoryForm({ category, newColor, onEdit, onSave }: CategoryFormProps) {
   const { t } = useTranslation()
   const colorGroup = useId()
-  const [name, setName] = useState(() => category ? getCategoryLabel(category, t) : '')
-  const [color, setColor] = useState(category?.color ?? categoryPalette.violet)
-  const [invalid, setInvalid] = useState(false)
+  const nameInput = useRef<HTMLInputElement>(null)
+  const [changes, setChanges] = useState<CategoryChanges>({})
+  const [error, setError] = useState<'empty' | 'duplicate' | null>(null)
+  const originalName = category ? getCategoryLabel(category, t) : ''
+  const originalColor = category?.color ?? newColor
+  const name = changes.name ?? originalName
+  const color = changes.color ?? originalColor
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const keepTranslatedName = category?.labelKey && category.name === undefined && name === getCategoryLabel(category, t)
-    const id = saveCategory(category?.id ?? null, keepTranslatedName ? undefined : name, color)
-    if (id) onSave(id)
-    else setInvalid(true)
+    const result = saveCategory(category?.id ?? null, category ? changes : { name, color }, t)
+    if (!result.ok) {
+      setError(result.reason)
+      nameInput.current?.focus()
+      return
+    }
+
+    setChanges({})
+    setError(null)
+    onSave(result.id)
   }
 
   return (
     <form className="space-y-4" onSubmit={submit} noValidate>
       <FormField
+        ref={nameInput}
         id="statement-category-name"
         label={t('statement.categories.name')}
-        error={invalid ? t('statement.categories.invalid') : undefined}
+        error={error ? t(error === 'duplicate' ? 'statement.categories.duplicate' : 'statement.categories.invalid') : undefined}
         value={name}
         onChange={(event) => {
-          setName(event.currentTarget.value)
-          setInvalid(false)
+          const value = event.currentTarget.value
+          setChanges((previous) => ({ ...previous, name: value === originalName ? undefined : value }))
+          setError(null)
+          onEdit()
         }}
         required
       />
@@ -48,7 +64,10 @@ function CategoryForm({ category, onSave }: { category?: Category; onSave: (id: 
                 name={colorGroup}
                 aria-label={t(`statement.colors.${key}`)}
                 checked={color === value}
-                onChange={() => setColor(value)}
+                onChange={() => {
+                  setChanges((previous) => ({ ...previous, color: value === originalColor ? undefined : value }))
+                  onEdit()
+                }}
               />
               <span aria-hidden="true" className="size-5 rounded-full" style={{ backgroundColor: value }} />
               {color === value && <Check aria-hidden="true" className="absolute -right-1 -top-1 size-4 rounded-full bg-primary text-primary-foreground" />}
@@ -70,6 +89,7 @@ export function CategoryManager() {
   const [selected, setSelected] = useState('')
   const [saved, setSaved] = useState(false)
   const category = categories.find(({ id }) => id === selected)
+  const newColor = categoryColors.find((color) => !categories.some((item) => item.color === color)) ?? categoryPalette.violet
 
   return (
     <details className="rounded-lg border border-border bg-card px-4 py-3 sm:px-5">
@@ -79,7 +99,7 @@ export function CategoryManager() {
       <div className="mt-4 max-w-xl space-y-4">
         <div className="space-y-1.5">
           <label className="block text-sm font-medium" htmlFor="statement-category-select">{t('statement.categories.select')}</label>
-          <select
+          <Select
             ref={select}
             id="statement-category-select"
             value={category?.id ?? ''}
@@ -87,15 +107,17 @@ export function CategoryManager() {
               setSelected(event.currentTarget.value)
               setSaved(false)
             }}
-            className="min-h-11 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-2 focus-visible:outline-ring"
+            className="w-full"
           >
             <option value="">{t('statement.categories.new')}</option>
             {categories.map((item) => <option key={item.id} value={item.id}>{getCategoryLabel(item, t)}</option>)}
-          </select>
+          </Select>
         </div>
         <CategoryForm
           key={category?.id ?? 'new'}
           category={category}
+          newColor={newColor}
+          onEdit={() => setSaved(false)}
           onSave={(id) => {
             if (id !== selected) select.current?.focus()
             setSelected(id)

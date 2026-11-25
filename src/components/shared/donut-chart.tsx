@@ -2,10 +2,15 @@ import { Pie, PieChart, ResponsiveContainer } from 'recharts'
 
 import { formatCents, formatPercent } from '@/lib/format'
 
-import type { ExpenseSegment } from '@/lib/expense-segments'
+export type DonutSegment = {
+  id: string
+  label: string
+  amountInCents: number
+  color: string
+}
 
 type DonutChartProps = {
-  segments: readonly ExpenseSegment[]
+  segments: readonly DonutSegment[]
   totalLabel: string
   emptyLabel: string
 }
@@ -18,7 +23,7 @@ export function DonutChart({ segments, totalLabel, emptyLabel }: DonutChartProps
 
   return (
     <div className="@container">
-      <div className="grid items-center gap-4 @min-[34rem]:grid-cols-[minmax(14rem,1fr)_minmax(0,1fr)]">
+      <div className="grid items-center gap-4 @xl:grid-cols-[minmax(14rem,1fr)_minmax(0,1fr)]">
         <figure className="relative mx-auto w-full max-w-64">
           <div className="aspect-square w-full" aria-hidden="true">
             <ResponsiveContainer width="100%" height="100%">
@@ -32,6 +37,7 @@ export function DonutChart({ segments, totalLabel, emptyLabel }: DonutChartProps
                   stroke="var(--card)"
                   strokeWidth={2}
                   isAnimationActive={false}
+                  rootTabIndex={-1}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -48,7 +54,7 @@ export function DonutChart({ segments, totalLabel, emptyLabel }: DonutChartProps
                 <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
                 <span className="min-w-0">{label}</span>
               </span>
-              <span className="text-right tabular-nums">
+              <span className="flex flex-wrap items-baseline justify-end gap-x-2 text-right tabular-nums @xl:block">
                 {formatCents(amountInCents)}
                 <span className="block text-xs text-muted-foreground">{formatPercent(amountInCents / total)}</span>
               </span>

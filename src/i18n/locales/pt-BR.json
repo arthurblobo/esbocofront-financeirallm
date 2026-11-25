@@ -1,6 +1,8 @@
 {
   "app": {
-    "name": "Financeiro"
+    "name": "Financeiro",
+    "routeError": "Não foi possível carregar a página.",
+    "reload": "Recarregar página"
   },
   "nav": {
     "label": "Navegação principal",
@@ -70,6 +72,7 @@
       "comparison": "em relação ao mês passado"
     },
     "summary": {
+      "previousPending": "Importe o extrato de {{month}} para comparar.",
       "noComparison": "Não há gastos em {{month}} para comparar.",
       "less": "Você gastou {{percent}} menos que em {{month}}.",
       "more": "Você gastou {{percent}} mais que em {{month}}.",
@@ -89,6 +92,7 @@
       "count": "Nº de transações"
     },
     "period": {
+      "range": "{{start}} a {{end}}",
       "label": "Período",
       "options": {
         "3": "Últimos 3 meses",
@@ -98,6 +102,8 @@
       }
     },
     "trend": {
+      "missingCount_one": "{{count}} mês sem extrato importado.",
+      "missingCount_other": "{{count}} meses sem extrato importado.",
       "title": "Entradas e saídas por mês",
       "table": "Ver dados em tabela",
       "month": "Mês",
@@ -134,6 +140,7 @@
       "transactions": "Transações do mês"
     },
     "categories": {
+      "duplicate": "Já existe uma categoria com esse nome.",
       "title": "Gerenciar categorias",
       "select": "Categoria",
       "new": "Nova categoria",
@@ -161,6 +168,7 @@
       "cyan": "Ciano",
       "emerald": "Esmeralda",
       "indigo": "Índigo",
+      "fuchsia": "Fúcsia",
       "brown": "Marrom"
     }
   }

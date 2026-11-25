@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { CartesianGrid, Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 type Point<Key extends string> = {
@@ -14,15 +15,47 @@ type LineChartProps<Key extends string> = {
   series: readonly Series<Key>[]
   formatValue: (value: number) => string
   formatTick: (value: number) => string
+  note?: ReactNode
   labels: { table: string; column: string; missing: string; empty: string }
 }
 
-export function LineChart<Key extends string>({ points, series, formatValue, formatTick, labels }: LineChartProps<Key>) {
+function ChartTooltip<Key extends string>({
+  point, series, formatValue, missing,
+}: {
+  point: Point<Key>
+  series: readonly Series<Key>[]
+  formatValue: (value: number) => string
+  missing: string
+}) {
+  return (
+    <div className="space-y-1 rounded-lg border border-input bg-popover px-3 py-2 text-xs text-popover-foreground">
+      <p className="font-semibold">{point.label}</p>
+      {series.every(({ key }) => point.values[key] === null) ? (
+        <p>{missing}</p>
+      ) : (
+        <dl className="grid grid-cols-[auto_auto] gap-x-3 gap-y-1">
+          {series.map(({ key, label }) => {
+            const value = point.values[key]
+            return (
+              <div key={key} className="contents">
+                <dt>{label}</dt>
+                <dd className="text-right tabular-nums">{value === null ? missing : formatValue(value)}</dd>
+              </div>
+            )
+          })}
+        </dl>
+      )}
+    </div>
+  )
+}
+
+export function LineChart<Key extends string>({ points, series, formatValue, formatTick, labels, note }: LineChartProps<Key>) {
+  const pointByKey = new Map(points.map((point) => [point.key, point]))
   const hasValues = points.some(({ values }) => series.some(({ key }) => values[key] !== null))
   const axisTick = { fill: 'var(--muted-foreground)', fontSize: 11 }
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-1 flex-col gap-4">
       {hasValues ? (
         <>
           <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
@@ -35,38 +68,55 @@ export function LineChart<Key extends string>({ points, series, formatValue, for
               </li>
             ))}
           </ul>
-          <div className="h-64 min-w-0 sm:h-80" aria-hidden="true">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsLineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 10, bottom: 0, left: 0 }}>
-                <CartesianGrid vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="tickLabel" tick={axisTick} tickLine={false} axisLine={false} minTickGap={14} interval="preserveStartEnd" padding={{ left: 10, right: 14 }} />
-                <YAxis width={70} tickCount={5} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={formatTick} />
-                <Tooltip
-                  cursor={{ stroke: 'var(--input)', strokeDasharray: '4 4' }}
-                  contentStyle={{ backgroundColor: 'var(--popover)', borderColor: 'var(--input)', borderRadius: '0.5rem' }}
-                  labelStyle={{ color: 'var(--popover-foreground)' }}
-                  formatter={(value) => typeof value === 'number' ? formatValue(value) : value}
-                />
-                {series.map(({ key, label, color, dash }) => (
-                  <Line
-                    key={key}
-                    name={label}
-                    dataKey={(point: Point<Key>) => point.values[key]}
-                    stroke={color}
-                    strokeWidth={2}
-                    strokeDasharray={dash}
-                    dot={{ r: 3, fill: color, stroke: 'var(--card)', strokeWidth: 1 }}
-                    connectNulls={false}
-                    isAnimationActive={false}
+          <div className="relative min-h-64 min-w-0 flex-1 sm:min-h-80" aria-hidden="true">
+            <div className="absolute inset-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsLineChart data={points} accessibilityLayer={false} margin={{ top: 8, right: 10, bottom: 0, left: 0 }}>
+                  <CartesianGrid vertical={false} stroke="var(--border)" />
+                  <XAxis
+                    dataKey="key"
+                    tickFormatter={(key: string) => pointByKey.get(key)?.tickLabel ?? ''}
+                    tick={axisTick}
+                    tickLine={false}
+                    axisLine={false}
+                    minTickGap={14}
+                    interval="equidistantPreserveStart"
+                    padding={{ left: 12, right: 24 }}
                   />
-                ))}
-              </RechartsLineChart>
-            </ResponsiveContainer>
+                  <YAxis width={70} tickCount={5} tick={axisTick} tickLine={false} axisLine={false} tickFormatter={formatTick} />
+                  <Tooltip
+                    cursor={{ stroke: 'var(--input)', strokeDasharray: '4 4' }}
+                    filterNull={false}
+                    content={({ active, label }) => {
+                      const point = typeof label === 'string' ? pointByKey.get(label) : undefined
+                      return active && point
+                        ? <ChartTooltip point={point} series={series} formatValue={formatValue} missing={labels.missing} />
+                        : null
+                    }}
+                  />
+                  {series.map(({ key, label, color, dash }) => (
+                    <Line
+                      key={key}
+                      name={label}
+                      dataKey={(point: Point<Key>) => point.values[key]}
+                      stroke={color}
+                      strokeWidth={2}
+                      strokeDasharray={dash}
+                      dot={{ r: 3, fill: color, stroke: 'var(--card)', strokeWidth: 1, strokeDasharray: 'none' }}
+                      activeDot={{ strokeDasharray: 'none' }}
+                      connectNulls={false}
+                      isAnimationActive={false}
+                    />
+                  ))}
+                </RechartsLineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </>
       ) : (
         <p className="text-sm text-muted-foreground">{labels.empty}</p>
       )}
+      {note}
       <details className="border-t border-border pt-3 text-sm">
         <summary className="w-fit cursor-pointer rounded-sm py-1 text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring">
           {labels.table}

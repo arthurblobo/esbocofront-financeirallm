@@ -1,19 +1,14 @@
 import type { TFunction } from 'i18next'
 
+import type { DonutSegment } from '@/components/shared/donut-chart'
 import { categoryPalette } from './category-palette'
 import { getCategoryLabel, UNCATEGORIZED_ID, type Category, type Transaction } from './data'
 
-export type ExpenseSegment = {
-  id: string
-  label: string
-  amountInCents: number
-  color: string
-}
-
-export function getExpenseSegments(transactions: readonly Transaction[], categories: readonly Category[], t: TFunction) {
+export function getCategoryTotals(
+  transactions: readonly Transaction[], categories: readonly Category[], t: TFunction,
+): DonutSegment[] {
   const categoryById = new Map(categories.map((category) => [category.id, category]))
-  const expenses = new Map<string, ExpenseSegment>()
-
+  const expenses = new Map<string, DonutSegment>()
   for (const transaction of transactions) {
     if (transaction.type !== 'expense') continue
 
@@ -27,6 +22,5 @@ export function getExpenseSegments(transactions: readonly Transaction[], categor
       amountInCents: (previous?.amountInCents ?? 0) + transaction.amountInCents,
     })
   }
-
   return [...expenses.values()].sort((a, b) => b.amountInCents - a.amountInCents)
 }

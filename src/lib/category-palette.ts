@@ -9,7 +9,7 @@ export const categoryPalette = {
   slate: '#64748b',
   cyan: '#0891b2',
   emerald: '#059669',
-  indigo: '#6366f1',
+  fuchsia: '#c026d3',
   brown: '#a16232',
 } as const
 

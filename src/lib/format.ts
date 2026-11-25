@@ -3,6 +3,7 @@ import { parseLocalDate } from './dates'
 
 export function formatCents(
   amountInCents: number,
+  signDisplay: Intl.NumberFormatOptions['signDisplay'] = 'auto',
   notation: Intl.NumberFormatOptions['notation'] = 'standard',
 ): string {
   return new Intl.NumberFormat(i18n.resolvedLanguage ?? defaultLanguage, {
@@ -11,6 +12,7 @@ export function formatCents(
     currencyDisplay: 'narrowSymbol',
     notation,
     useGrouping: 'always',
+    signDisplay,
   }).format(amountInCents / 100)
 }
 

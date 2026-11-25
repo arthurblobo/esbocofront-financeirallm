@@ -1,5 +1,6 @@
 import type { Transaction } from './data'
 import { parseLocalDate, toLocalDateKey } from './dates'
+import { getVariation } from './month-summary'
 
 export const dashboardPeriods = ['3', '6', '12', 'all'] as const
 export type DashboardPeriod = (typeof dashboardPeriods)[number]
@@ -25,7 +26,6 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
   const month = today.getMonth()
   const currentStart = new Date(year, month, 1)
   const currentMonth = toLocalDateKey(currentStart).slice(0, 7)
-  const previousMonth = toLocalDateKey(new Date(year, month - 1, 1)).slice(0, 7)
   const fixedMonths = period === 'all' ? null : Number(period)
   const start = fixedMonths === null ? null : new Date(year, month - fixedMonths + 1, 1)
   const startMonth = start === null ? null : toLocalDateKey(start).slice(0, 7)
@@ -47,7 +47,8 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
   }
 
   const months = []
-  const cursor = start ?? parseLocalDate(`${firstMonth}-01`)
+  const rangeStart = startMonth !== null && startMonth > firstMonth ? startMonth : firstMonth
+  const cursor = parseLocalDate(`${rangeStart}-01`)
   while (cursor <= currentStart) {
     const key = toLocalDateKey(cursor).slice(0, 7)
     const monthly = byMonth.get(key)
@@ -59,12 +60,24 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
     cursor.setMonth(cursor.getMonth() + 1)
   }
 
-  const current = byMonth.get(currentMonth)
-  const previous = byMonth.get(previousMonth)
+  const historicalTotals = withBalance(totals)
+  const currentMonthTotals = byMonth.get(currentMonth)
+  const current = currentMonthTotals && withBalance(currentMonthTotals)
+  function accumulatedVariation(field: keyof typeof historicalTotals) {
+    if (!current || firstMonth === currentMonth) return null
+
+    const total = historicalTotals[field]
+    return getVariation(total, total - current[field], true)
+  }
+
   return {
-    totals: withBalance(totals),
-    current: current && withBalance(current),
-    previous: previous && withBalance(previous),
+    totals: historicalTotals,
+    variations: {
+      income: accumulatedVariation('income'),
+      expenses: accumulatedVariation('expenses'),
+      balance: accumulatedVariation('balance'),
+      count: accumulatedVariation('count'),
+    },
     months,
     periodTransactions,
   }
