@@ -34,7 +34,7 @@ Corrigir bloqueante e importantes antes da Fatia 4; as Sugestões também devem 
 - [SUGESTÃO] src/app.tsx:14 – mesmo problema do item 18 da revisão 2 (chunk lazy sem ErrorBoundary), agora também no dashboard – correção esperada: a da revisão 2.
 
 ## Fora do escopo notado (não corrigir agora)
-- Integração: esta branch já traz a container query no DonutChart (item 1 da revisão 2) e src/lib/expense-segments.ts, que resolve o item 3 no lugar de category-totals.ts. Ao juntar com a feat/fatia-2, manter estas versões e não criar a segunda. O merge com `origin/feat/fatia-2` (5112779) não conflita hoje; pode conflitar depois que a revisão 2 for aplicada lá.
+- Integração: esta branch já traz a container query no DonutChart (item 1 da revisão 2) e src/lib/expense-segments.ts, que resolve o item 3 no lugar de category-totals.ts. A feat/fatia-2 entra primeiro, com a revisão 2 aplicada: ao trazê-la para cá, manter o DonutChart e o category-totals.ts dela, remover expense-segments.ts e ajustar os imports do dashboard e da importação. O merge com `origin/feat/fatia-2` em 5112779 não conflita; com a revisão 2 aplicada, é provável que conflite nesses arquivos, nos locales e em format.ts.
 - Rótulos do donut: a referência mostra rótulos em volta do anel; a legenda com nome, valor e % atende à descrição do escopo.
 - O mês atual, parcial, entra no gráfico como os demais.
 - O período escolhido não sincroniza entre abas já abertas; é preferência local e vale após recarregar.
