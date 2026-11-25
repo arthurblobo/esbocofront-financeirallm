@@ -83,6 +83,61 @@
       "empty": "No hay gastos registrados este mes."
     }
   },
+  "settings": {
+    "profile": "Perfil",
+    "save": "Guardar perfil",
+    "fields": {
+      "name": "Nombre",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "cpf": "CPF",
+      "birthDate": "Fecha de nacimiento"
+    },
+    "locked": {
+      "demo": "El CPF y la fecha de nacimiento son ficticios y se muestran solo como demostración.",
+      "masked": "parcialmente oculto",
+      "title": "Datos bloqueados",
+      "reason": "Estos datos están bloqueados para protegerte de estafas. Ponte en contacto con el soporte para cambiarlos."
+    },
+    "photo": {
+      "title": "Foto de perfil",
+      "hint": "JPG, PNG o WebP, hasta 5 MB.",
+      "avatar": "Avatar de {{name}}",
+      "choose": "Elegir foto",
+      "remove": "Quitar foto"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "language": "Idioma",
+      "theme": "Tema"
+    },
+    "themes": {
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "status": {
+      "profileSaved": "Perfil guardado.",
+      "photoSaved": "Foto guardada.",
+      "photoRemoved": "Foto eliminada.",
+      "photoProcessing": "Preparando la foto…"
+    },
+    "errors": {
+      "nameRequired": "Introduce tu nombre.",
+      "phoneFormat": "Introduce un teléfono brasileño válido con código de área.",
+      "storage": "No se pudo guardar el cambio en este navegador.",
+      "photoType": "Elige una imagen JPG, PNG o WebP.",
+      "photoSize": "La imagen debe pesar como máximo 5 MB.",
+      "photoRead": "No se pudo abrir la imagen.",
+      "photoStorageKept": "No se pudo guardar la nueva foto. Se conservó la foto actual.",
+      "photoRemoveFailed": "No se pudo quitar la foto. Se conservó la foto actual.",
+      "photoStorage": "No se pudo guardar la foto en este navegador. Tu avatar muestra tus iniciales."
+    },
+    "languages": {
+      "pt-BR": "Português (Brasil)",
+      "en": "English",
+      "es": "Español"
+    }
+  },
   "dashboard": {
     "loading": "Cargando el panel…",
     "metrics": {

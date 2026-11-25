@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { readStorage, writeStorage } from './storage'
+import { readStorage, subscribeStorage, writeStorage } from './storage'
 
 type Theme = 'light' | 'dark'
 
@@ -20,13 +20,22 @@ export function applyTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme
 }
 
-export function saveTheme(theme: Theme): void {
+function setTheme(theme: Theme) {
   if (theme === currentTheme) return
 
   currentTheme = theme
   applyTheme(theme)
-  writeStorage(storageKey, theme)
   listeners.forEach((listener) => listener())
+}
+
+if (typeof window !== 'undefined') {
+  subscribeStorage(storageKey, () => setTheme(readStorage(storageKey) === 'light' ? 'light' : 'dark'))
+}
+
+export function saveTheme(theme: Theme): boolean {
+  const saved = writeStorage(storageKey, theme)
+  if (!saved) setTheme(theme)
+  return saved
 }
 
 export function useTheme(): Theme {

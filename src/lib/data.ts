@@ -8,6 +8,7 @@ import { parseLocalDate, toLocalDateKey } from './dates'
 import { readStorage, subscribeStorage, writeStorage } from './storage'
 
 export { getCategoryLabel, UNCATEGORIZED_ID } from '@/mocks/categories'
+export { mockProfile } from '@/mocks/profile'
 export type { Category, CategoryId } from '@/mocks/categories'
 export type { Transaction } from '@/mocks/transactions'
 

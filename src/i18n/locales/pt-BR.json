@@ -83,6 +83,61 @@
       "empty": "Nenhuma despesa registrada neste mês."
     }
   },
+  "settings": {
+    "profile": "Perfil",
+    "save": "Salvar perfil",
+    "fields": {
+      "name": "Nome",
+      "phone": "Telefone",
+      "email": "E-mail",
+      "cpf": "CPF",
+      "birthDate": "Data de nascimento"
+    },
+    "locked": {
+      "demo": "CPF e data de nascimento são fictícios, apenas para demonstração.",
+      "masked": "parcialmente oculto",
+      "title": "Dados bloqueados",
+      "reason": "Esses dados ficam bloqueados para proteger você contra golpes. Para alterá-los, entre em contato com o suporte."
+    },
+    "photo": {
+      "title": "Foto de perfil",
+      "hint": "JPG, PNG ou WebP, até 5 MB.",
+      "avatar": "Avatar de {{name}}",
+      "choose": "Escolher foto",
+      "remove": "Remover foto"
+    },
+    "preferences": {
+      "title": "Preferências",
+      "language": "Idioma",
+      "theme": "Tema"
+    },
+    "themes": {
+      "light": "Claro",
+      "dark": "Escuro"
+    },
+    "status": {
+      "profileSaved": "Perfil salvo.",
+      "photoSaved": "Foto salva.",
+      "photoRemoved": "Foto removida.",
+      "photoProcessing": "Preparando foto…"
+    },
+    "errors": {
+      "nameRequired": "Informe seu nome.",
+      "phoneFormat": "Informe um telefone brasileiro válido com DDD.",
+      "storage": "Não foi possível salvar a alteração neste navegador.",
+      "photoType": "Escolha uma imagem JPG, PNG ou WebP.",
+      "photoSize": "A imagem deve ter até 5 MB.",
+      "photoRead": "Não foi possível abrir a imagem.",
+      "photoStorageKept": "Não foi possível salvar a nova foto. A foto atual foi mantida.",
+      "photoRemoveFailed": "Não foi possível remover a foto. A foto atual foi mantida.",
+      "photoStorage": "Não foi possível salvar a foto neste navegador. O avatar exibe suas iniciais."
+    },
+    "languages": {
+      "pt-BR": "Português (Brasil)",
+      "en": "English",
+      "es": "Español"
+    }
+  },
   "dashboard": {
     "loading": "Carregando o dashboard…",
     "metrics": {

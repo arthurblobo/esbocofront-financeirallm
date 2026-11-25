@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 
+import { getProfileName, saveProfileName } from './profile'
 import { readStorage, subscribeStorage, writeStorage } from './storage'
 
 export type User = {
@@ -43,11 +44,17 @@ function readSession(): Session | null {
   return snapshot
 }
 
-function saveSession(session: Session) {
+function publishSessionInMemory(session: Session) {
   snapshot = session
-  if (!writeStorage(sessionKey, JSON.stringify(session))) {
-    listeners.forEach((listener) => listener())
-  }
+  listeners.forEach((listener) => listener())
+}
+
+function saveSession(session: Session): boolean {
+  snapshot = session
+  if (writeStorage(sessionKey, JSON.stringify(session))) return true
+
+  publishSessionInMemory(session)
+  return false
 }
 
 function subscribe(listener: () => void) {
@@ -68,12 +75,32 @@ export function login(name: string, email: string): void {
   saveSession({
     active: true,
     user: {
-      name,
+      name: getProfileName(email) ?? name,
       email,
       loginCount: (previous?.user.loginCount ?? 0) + 1,
       lastLoginAt: new Date().toISOString(),
     },
   })
+}
+
+export function updateSessionName(name: string): boolean {
+  const session = readSession()
+  const trimmedName = name.trim()
+  if (!session?.active || !trimmedName) return false
+  const email = session.user.email
+  const previousName = getProfileName(email)
+  if (session.user.name === trimmedName && previousName === trimmedName) return true
+
+  const next = { ...session, user: { ...session.user, name: trimmedName } }
+  if (!saveProfileName(email, trimmedName)) {
+    publishSessionInMemory(next)
+    return false
+  }
+  if (saveSession(next)) return true
+
+  // A failed session write must not silently make the edit permanent through the profile.
+  saveProfileName(email, previousName)
+  return false
 }
 
 export function logout(): void {
