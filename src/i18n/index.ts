@@ -1,6 +1,8 @@
 import { createInstance } from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
+import { readStorage } from '@/lib/storage'
+
 import en from './locales/en.json'
 import es from './locales/es.json'
 import ptBR from './locales/pt-BR.json'
@@ -26,9 +28,10 @@ function updateDocumentLanguage(language: string) {
 }
 
 export async function initializeI18n() {
+  const savedLanguage = readStorage('language')
   await i18n.use(initReactI18next).init({
     resources,
-    lng: defaultLanguage,
+    lng: savedLanguage && Object.hasOwn(resources, savedLanguage) ? savedLanguage : defaultLanguage,
     fallbackLng: defaultLanguage,
     supportedLngs: Object.keys(resources),
     interpolation: { escapeValue: false },

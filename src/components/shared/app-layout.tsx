@@ -1,13 +1,13 @@
 import { Menu, Moon, Sun, Wallet, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
-import { getTheme, saveTheme } from '@/lib/theme'
+import { saveTheme, useTheme } from '@/lib/theme'
 import { pages } from '@/routes'
 
-function Navigation({ onNavigate }: { onNavigate?: () => void }) {
+function Navigation({ onNavigate }: { onNavigate?: (event: MouseEvent<HTMLAnchorElement>) => void }) {
   const { t } = useTranslation()
 
   return (
@@ -18,7 +18,7 @@ function Navigation({ onNavigate }: { onNavigate?: () => void }) {
           to={to}
           end
           onClick={onNavigate}
-          className="flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground outline-none hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground last:mt-auto"
+          className="flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground last:mt-auto"
         >
           <Icon aria-hidden="true" className="size-4 shrink-0" />
           {t(title)}
@@ -43,14 +43,43 @@ function Brand() {
 
 export function AppLayout() {
   const { t } = useTranslation()
-  const [theme, setTheme] = useState(getTheme)
+  const isDark = useTheme() === 'dark'
+  const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
-  const isDark = theme === 'dark'
+  const menuButton = useRef<HTMLButtonElement>(null)
+  const main = useRef<HTMLElement>(null)
+  const focusMainAfterNavigation = useRef(false)
 
-  function toggleTheme() {
-    const nextTheme = isDark ? 'light' : 'dark'
-    saveTheme(nextTheme)
-    setTheme(nextTheme)
+  useLayoutEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
+
+  useLayoutEffect(() => {
+    if (!menuOpen && focusMainAfterNavigation.current) {
+      focusMainAfterNavigation.current = false
+      main.current?.focus()
+    }
+  }, [menuOpen])
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    function onEscape(event: KeyboardEvent) {
+      if (event.key !== 'Escape' || event.defaultPrevented) return
+
+      setMenuOpen(false)
+      menuButton.current?.focus()
+    }
+
+    document.addEventListener('keydown', onEscape)
+    return () => document.removeEventListener('keydown', onEscape)
+  }, [menuOpen])
+
+  function onMobileNavigate(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+
+    focusMainAfterNavigation.current = true
+    setMenuOpen(false)
   }
 
   return (
@@ -66,6 +95,8 @@ export function AppLayout() {
         <header className="border-b border-border bg-card">
           <div className="flex min-h-16 items-center gap-2 px-4 sm:px-6">
             <Button
+              ref={menuButton}
+              size="icon"
               variant="ghost"
               className="md:hidden"
               aria-label={t(menuOpen ? 'nav.close' : 'nav.open')}
@@ -79,19 +110,24 @@ export function AppLayout() {
               <Brand />
             </div>
             <Button
+              size="icon"
               className="ml-auto"
               aria-label={t(isDark ? 'theme.light' : 'theme.dark')}
-              onClick={toggleTheme}
+              onClick={() => saveTheme(isDark ? 'light' : 'dark')}
             >
               {isDark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
             </Button>
           </div>
 
           <div id="mobile-navigation" hidden={!menuOpen} className="md:hidden">
-            {menuOpen && <Navigation onNavigate={() => setMenuOpen(false)} />}
+            {menuOpen && <Navigation onNavigate={onMobileNavigate} />}
           </div>
         </header>
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:py-8">
+        <main
+          ref={main}
+          tabIndex={-1}
+          className="mx-auto max-w-7xl px-4 py-6 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring sm:px-6 md:py-8"
+        >
           <Outlet />
         </main>
       </div>

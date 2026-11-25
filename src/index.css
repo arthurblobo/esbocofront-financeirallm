@@ -12,6 +12,16 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
   --color-ring: var(--primary);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-muted: var(--muted);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-input: var(--input);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 }
 
 :root {
@@ -25,6 +35,16 @@
   --accent: #251c38;
   --accent-foreground: #d9caff;
   --border: #29272f;
+  --positive: #4ade80;
+  --negative: #f87171;
+  --muted: #1c1b21;
+  --secondary: #1f1e25;
+  --secondary-foreground: #f5f4f7;
+  --destructive: #f87171;
+  --destructive-foreground: #1a0b0b;
+  --input: #6f6c7a;
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
 }
 
 :root[data-theme="light"] {
@@ -38,6 +58,16 @@
   --accent: #eee8ff;
   --accent-foreground: #492490;
   --border: #dedbe7;
+  --positive: #15803d;
+  --negative: #b91c1c;
+  --muted: #f0eff4;
+  --secondary: #f0eff4;
+  --secondary-foreground: #18171d;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --input: #85808f;
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
 }
 
 @layer base {

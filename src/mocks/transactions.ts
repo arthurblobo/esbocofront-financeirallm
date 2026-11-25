@@ -1,46 +1,79 @@
-import type { CategoryId } from './categories'
+import { toLocalDateKey } from '@/lib/dates'
+import { UNCATEGORIZED_ID, type CategoryId } from './categories'
 
 type TransactionKind =
   | { type: 'income'; categoryId: null }
   | { type: 'expense'; categoryId: CategoryId }
 
-type Transaction = TransactionKind & {
-  id: string
-  date: string
+type Entry = TransactionKind & {
+  description: string
   amountInCents: number
 }
 
-type MonthlyEntry = TransactionKind & {
-  day: number
-  baseInCents: number
-  variationInCents: number
-}
+export type Transaction = Entry & { id: string; date: string }
 
-const monthlyEntries: MonthlyEntry[] = [
-  { day: 1, type: 'income', categoryId: null, baseInCents: 650000, variationInCents: 2500 },
-  { day: 2, type: 'expense', categoryId: 'housing', baseInCents: 190000, variationInCents: 1000 },
-  { day: 4, type: 'expense', categoryId: 'food', baseInCents: 37000, variationInCents: 2090 },
-  { day: 5, type: 'expense', categoryId: 'transport', baseInCents: 22000, variationInCents: 1730 },
-  { day: 7, type: 'expense', categoryId: 'health', baseInCents: 18000, variationInCents: 1310 },
-  { day: 8, type: 'expense', categoryId: 'subscriptions', baseInCents: 8990, variationInCents: 0 },
-  { day: 9, type: 'expense', categoryId: 'education', baseInCents: 42000, variationInCents: 0 },
-  { day: 11, type: 'expense', categoryId: 'leisure', baseInCents: 15000, variationInCents: 1870 },
+type MonthlyEntry = Entry & { day: number }
+
+const expenseProfiles = [
+  { categoryId: 'food', descriptions: ['Supermercado BH', 'Padaria Central', 'Hortifruti'], baseCents: 16500 },
+  { categoryId: 'housing', descriptions: ['Condomínio', 'Energia elétrica', 'Conta de água'], baseCents: 12500 },
+  { categoryId: 'transport', descriptions: ['Uber', 'Posto Avenida', 'Recarga de transporte'], baseCents: 7900 },
+  { categoryId: 'health', descriptions: ['Farmácia Popular', 'Consulta médica', 'Laboratório'], baseCents: 8900 },
+  { categoryId: 'leisure', descriptions: ['Cinema', 'Livraria', 'Restaurante'], baseCents: 6100 },
+  { categoryId: 'subscriptions', descriptions: ['Netflix', 'Spotify', 'Google One'], baseCents: 2500 },
+  { categoryId: 'education', descriptions: ['Curso de inglês', 'Material escolar', 'Curso online'], baseCents: 11200 },
 ]
-const unidentified: MonthlyEntry = {
-  day: 13,
-  type: 'expense',
-  categoryId: 'uncategorized',
-  baseInCents: 7490,
-  variationInCents: 420,
+
+function generateMonth(monthStart: Date): Transaction[] {
+  const year = monthStart.getFullYear()
+  const month = monthStart.getMonth()
+  const monthKey = toLocalDateKey(monthStart).slice(0, 7)
+  const monthNumber = year * 12 + month
+  const entries: MonthlyEntry[] = [
+    { day: 1, type: 'income', categoryId: null, description: 'Salário', amountInCents: 630000 + (monthNumber % 9) * 6500 },
+    { day: 1, type: 'expense', categoryId: UNCATEGORIZED_ID, description: `PIX ${48213 + monthNumber % 500}`, amountInCents: 3200 + (monthNumber % 11) * 460 },
+    { day: 5, type: 'expense', categoryId: 'housing', description: 'Aluguel', amountInCents: 175000 },
+  ]
+
+  if (monthNumber % 3 === 0) {
+    entries.push({ day: 17, type: 'income', categoryId: null, description: 'Freelance', amountInCents: 42000 + (monthNumber % 7) * 13000 })
+  }
+  if (monthNumber % 4 === 1) {
+    entries.push({ day: 12, type: 'income', categoryId: null, description: 'Reembolso', amountInCents: 17000 + (monthNumber % 7) * 2400 })
+  }
+  if (month === 11) {
+    entries.push({ day: 19, type: 'income', categoryId: null, description: '13º salário', amountInCents: 310000 })
+  }
+  if (month === 0) {
+    entries.push({ day: 20, type: 'expense', categoryId: 'housing', description: 'Reforma residencial', amountInCents: 690000 })
+  }
+
+  expenseProfiles.forEach(({ categoryId, descriptions, baseCents }, profileIndex) => {
+    const seed = monthNumber * (profileIndex + 3) + profileIndex * 7
+    const countSeed = monthNumber + Math.floor(monthNumber / 12) + profileIndex * 3
+    const count = categoryId === 'housing' ? 1 + countSeed % 4 : 2 + countSeed % 5
+
+    for (let index = 0; index < count; index += 1) {
+      entries.push({
+        type: 'expense',
+        categoryId,
+        day: 2 + (seed + index * 7) % 27,
+        description: descriptions[index % descriptions.length],
+        amountInCents: Math.round(baseCents * (65 + (seed + index * 29) % 100) / 100),
+      })
+    }
+  })
+
+  return entries.sort((a, b) => a.day - b.day).map(({ day, ...entry }, index) => ({
+    ...entry,
+    id: `mock-${monthKey}-${String(index + 1).padStart(2, '0')}`,
+    date: toLocalDateKey(new Date(year, month, day)),
+  }))
 }
 
-export const transactions: Transaction[] = Array.from({ length: 18 }, (_, month) => {
-  const entries = month % 3 === 0 ? [...monthlyEntries, unidentified] : monthlyEntries
-
-  return entries.map(({ day, baseInCents, variationInCents, ...kind }, index) => ({
-    ...kind,
-    id: `mock-${month + 1}-${index + 1}`,
-    date: new Date(Date.UTC(2025, 5 + month, day)).toISOString().slice(0, 10),
-    amountInCents: baseInCents + ((month * 7 + index) % 11) * variationInCents,
-  }))
-}).flat()
+export function createTransactions(today = new Date()): Transaction[] {
+  const todayKey = toLocalDateKey(today)
+  return Array.from({ length: 18 }, (_, index) =>
+    generateMonth(new Date(today.getFullYear(), today.getMonth() - 17 + index, 1)),
+  ).flat().filter(({ date }) => date <= todayKey)
+}

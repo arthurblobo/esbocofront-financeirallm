@@ -1,12 +1,28 @@
-export const categories = [
-  { id: 'food', labelKey: 'categories.food', color: '#a78bfa' },
-  { id: 'housing', labelKey: 'categories.housing', color: '#60a5fa' },
-  { id: 'transport', labelKey: 'categories.transport', color: '#2dd4bf' },
-  { id: 'health', labelKey: 'categories.health', color: '#fb7185' },
-  { id: 'leisure', labelKey: 'categories.leisure', color: '#fbbf24' },
-  { id: 'subscriptions', labelKey: 'categories.subscriptions', color: '#f472b6' },
-  { id: 'education', labelKey: 'categories.education', color: '#a3e635' },
-  { id: 'uncategorized', labelKey: 'categories.uncategorized', color: '#94a3b8' },
-] as const
+import type { TFunction } from 'i18next'
+import type ptBR from '@/i18n/locales/pt-BR.json'
 
-export type CategoryId = (typeof categories)[number]['id']
+export type CategoryId = string
+type DefaultCategoryLabelKey = `categories.${keyof typeof ptBR.categories}`
+
+export type Category = { id: CategoryId; color: string } & (
+  | { labelKey: DefaultCategoryLabelKey; name?: string }
+  | { labelKey?: never; name: string }
+)
+
+export const UNCATEGORIZED_ID = 'uncategorized'
+
+export const defaultCategories: readonly Category[] = [
+  { id: 'food', labelKey: 'categories.food', color: '#8b5cf6' },
+  { id: 'housing', labelKey: 'categories.housing', color: '#3b82f6' },
+  { id: 'transport', labelKey: 'categories.transport', color: '#0d9488' },
+  { id: 'health', labelKey: 'categories.health', color: '#e11d48' },
+  { id: 'leisure', labelKey: 'categories.leisure', color: '#d57406' },
+  { id: 'subscriptions', labelKey: 'categories.subscriptions', color: '#db2777' },
+  { id: 'education', labelKey: 'categories.education', color: '#649b0d' },
+  { id: UNCATEGORIZED_ID, labelKey: 'categories.uncategorized', color: '#64748b' },
+]
+
+export function getCategoryLabel(category: Category, t: TFunction): string {
+  if (category.labelKey === undefined) return category.name
+  return category.name ?? t(category.labelKey)
+}
