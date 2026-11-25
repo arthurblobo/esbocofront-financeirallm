@@ -76,6 +76,18 @@ export function login(name: string, email: string): void {
   })
 }
 
+export function updateSessionName(name: string): boolean {
+  const session = readSession()
+  const trimmedName = name.trim()
+  if (!session?.active || !trimmedName) return false
+  if (session.user.name === trimmedName) return true
+
+  return writeStorage(sessionKey, JSON.stringify({
+    ...session,
+    user: { ...session.user, name: trimmedName },
+  }))
+}
+
 export function logout(): void {
   const session = readSession()
   if (session?.active) saveSession({ ...session, active: false })

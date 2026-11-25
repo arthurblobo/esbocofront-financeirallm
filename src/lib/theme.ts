@@ -20,13 +20,13 @@ export function applyTheme(theme: Theme): void {
   document.documentElement.dataset.theme = theme
 }
 
-export function saveTheme(theme: Theme): void {
-  if (theme === currentTheme) return
-
+export function saveTheme(theme: Theme): boolean {
+  const changed = currentTheme !== theme
   currentTheme = theme
   applyTheme(theme)
-  writeStorage(storageKey, theme)
-  listeners.forEach((listener) => listener())
+  const saved = writeStorage(storageKey, theme)
+  if (changed) listeners.forEach((listener) => listener())
+  return saved
 }
 
 export function useTheme(): Theme {

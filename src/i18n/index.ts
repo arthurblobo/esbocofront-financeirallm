@@ -1,7 +1,7 @@
 import { createInstance } from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
-import { readStorage } from '@/lib/storage'
+import { readStorage, writeStorage } from '@/lib/storage'
 
 import en from './locales/en.json'
 import es from './locales/es.json'
@@ -13,6 +13,19 @@ const resources = {
   'pt-BR': { translation: ptBR },
   en: { translation: en },
   es: { translation: es },
+}
+
+type Language = keyof typeof resources
+export const supportedLanguages = Object.keys(resources) as Language[]
+
+export function isLanguage(value: string | null): value is Language {
+  return value !== null && Object.hasOwn(resources, value)
+}
+
+export function saveLanguage(language: Language): boolean {
+  const saved = writeStorage('language', language)
+  void i18n.changeLanguage(language)
+  return saved
 }
 
 declare module 'i18next' {
@@ -31,9 +44,9 @@ export async function initializeI18n() {
   const savedLanguage = readStorage('language')
   await i18n.use(initReactI18next).init({
     resources,
-    lng: savedLanguage && Object.hasOwn(resources, savedLanguage) ? savedLanguage : defaultLanguage,
+    lng: isLanguage(savedLanguage) ? savedLanguage : defaultLanguage,
     fallbackLng: defaultLanguage,
-    supportedLngs: Object.keys(resources),
+    supportedLngs: supportedLanguages,
     interpolation: { escapeValue: false },
   })
 

@@ -83,6 +83,57 @@
       "empty": "No expenses recorded this month."
     }
   },
+  "settings": {
+    "profile": "Profile",
+    "save": "Save profile",
+    "fields": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "cpf": "CPF",
+      "birthDate": "Date of birth"
+    },
+    "locked": {
+      "title": "Locked information",
+      "reason": "This information is locked to protect you from scams. Contact support to change it."
+    },
+    "photo": {
+      "title": "Profile photo",
+      "hint": "JPG, PNG, or WebP, up to 5 MB.",
+      "avatar": "Avatar of {{name}}",
+      "choose": "Choose photo",
+      "remove": "Remove photo"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": "Language",
+      "theme": "Theme"
+    },
+    "themes": {
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "status": {
+      "profileSaved": "Profile saved.",
+      "photoSaved": "Photo saved.",
+      "photoRemoved": "Photo removed.",
+      "photoProcessing": "Preparing photo…"
+    },
+    "errors": {
+      "nameRequired": "Enter your name.",
+      "phoneFormat": "Enter a phone number with an area code and 10 or 11 digits.",
+      "storage": "The change could not be saved in this browser.",
+      "photoType": "Choose a JPG, PNG, or WebP image.",
+      "photoSize": "The image must be 5 MB or smaller.",
+      "photoRead": "The image could not be opened.",
+      "photoStorage": "The photo could not be saved in this browser. Your avatar displays your initials."
+    },
+    "languages": {
+      "pt-BR": "Português (Brasil)",
+      "en": "English",
+      "es": "Español"
+    }
+  },
   "dashboard": {
     "loading": "Loading the dashboard…",
     "metrics": {

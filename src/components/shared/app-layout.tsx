@@ -3,7 +3,10 @@ import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'r
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
 
+import { ProfileAvatar } from '@/components/shared/profile-avatar'
 import { Button } from '@/components/ui/button'
+import { useProfile } from '@/lib/profile'
+import { useSession } from '@/lib/session'
 import { saveTheme, useTheme } from '@/lib/theme'
 import { pages } from '@/routes'
 
@@ -44,6 +47,8 @@ function Brand() {
 export function AppLayout() {
   const { t } = useTranslation()
   const isDark = useTheme() === 'dark'
+  const user = useSession()?.user
+  const { photo } = useProfile(user?.email)
   const location = useLocation()
   const { pathname } = location
   const navigationType = useNavigationType()
@@ -123,6 +128,7 @@ export function AppLayout() {
             >
               {isDark ? <Sun aria-hidden="true" /> : <Moon aria-hidden="true" />}
             </Button>
+            {user && <ProfileAvatar name={user.name} photo={photo} className="text-sm" />}
           </div>
 
           <div id="mobile-navigation" hidden={!menuOpen} className="md:hidden">
