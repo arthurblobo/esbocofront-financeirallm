@@ -36,7 +36,10 @@ export function HomePage() {
   const { current, previous, currentStart, previousStart, topExpenses } = getMonthSummary(transactions, new Date())
   const expenseVariation = getVariation(current.expenses, previous.expenses, previous.hasData)
   const previousMonth = formatDate(previousStart, { month: 'long' })
-  const summary = expenseVariation === null
+  const previousImported = getStatementMonthStatus(calendar, calendar.previousMonth) === 'imported'
+  const summary = !previousImported
+    ? t('home.summary.previousPending', { month: previousMonth })
+    : expenseVariation === null
     ? t('home.summary.noComparison', { month: previousMonth })
     : t(expenseVariation === 0 ? 'home.summary.equal' : expenseVariation > 0 ? 'home.summary.more' : 'home.summary.less', {
         month: previousMonth,

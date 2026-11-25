@@ -1,6 +1,8 @@
 {
   "app": {
-    "name": "Financeiro"
+    "name": "Financeiro",
+    "routeError": "No se pudo cargar la página.",
+    "reload": "Recargar página"
   },
   "nav": {
     "label": "Navegación principal",
@@ -70,6 +72,7 @@
       "comparison": "respecto al mes pasado"
     },
     "summary": {
+      "previousPending": "Importa el extracto de {{month}} para comparar.",
       "noComparison": "No hay gastos en {{month}} para comparar.",
       "less": "Gastaste un {{percent}} menos que en {{month}}.",
       "more": "Gastaste un {{percent}} más que en {{month}}.",
@@ -109,6 +112,7 @@
       "transactions": "Transacciones del mes"
     },
     "categories": {
+      "duplicate": "Ya existe una categoría con ese nombre.",
       "title": "Gestionar categorías",
       "select": "Categoría",
       "new": "Nueva categoría",
@@ -135,7 +139,7 @@
       "slate": "Gris azulado",
       "cyan": "Cian",
       "emerald": "Esmeralda",
-      "indigo": "Índigo",
+      "fuchsia": "Fucsia",
       "brown": "Marrón"
     }
   }

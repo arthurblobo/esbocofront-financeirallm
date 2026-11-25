@@ -28,7 +28,11 @@ export function TransactionRow({ transaction, category, highlighted, actions }: 
             <span>{formatDate(transaction.date)}</span>
           </div>
         </div>
-        <p className="text-sm font-medium tabular-nums">{formatCents(transaction.amountInCents)}</p>
+        <p className={cn('text-sm font-medium tabular-nums', transaction.type === 'income' && 'text-positive')}>
+          {transaction.type === 'income'
+            ? formatCents(transaction.amountInCents, 'always')
+            : formatCents(-transaction.amountInCents, 'always')}
+        </p>
       </div>
       {actions}
     </li>
