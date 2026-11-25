@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--primary);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-muted: var(--muted);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-input: var(--input);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+}
+
+:root {
+  color-scheme: dark;
+  --background: #0b0b0d;
+  --foreground: #f5f4f7;
+  --card: #121215;
+  --muted-foreground: #b0aeb9;
+  --primary: #b9a2ff;
+  --primary-foreground: #151020;
+  --accent: #251c38;
+  --accent-foreground: #d9caff;
+  --border: #29272f;
+  --positive: #4ade80;
+  --negative: #f87171;
+  --muted: #1c1b21;
+  --secondary: #1f1e25;
+  --secondary-foreground: #f5f4f7;
+  --destructive: #f87171;
+  --destructive-foreground: #1a0b0b;
+  --input: #6f6c7a;
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --background: #f7f7fa;
+  --foreground: #18171d;
+  --card: #ffffff;
+  --muted-foreground: #575260;
+  --primary: #5c32b1;
+  --primary-foreground: #ffffff;
+  --accent: #eee8ff;
+  --accent-foreground: #492490;
+  --border: #dedbe7;
+  --positive: #15803d;
+  --negative: #b91c1c;
+  --muted: #f0eff4;
+  --secondary: #f0eff4;
+  --secondary-foreground: #18171d;
+  --destructive: #b91c1c;
+  --destructive-foreground: #ffffff;
+  --input: #85808f;
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
