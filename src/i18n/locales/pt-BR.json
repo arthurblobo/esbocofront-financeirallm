@@ -24,5 +24,54 @@
     "subscriptions": "Assinaturas",
     "education": "Educação",
     "uncategorized": "Não identificado"
+  },
+  "login": {
+    "title": "Acesse sua conta",
+    "fields": {
+      "name": "Nome",
+      "email": "E-mail",
+      "password": "Senha"
+    },
+    "errors": {
+      "name": "Informe seu nome.",
+      "email": "Informe um e-mail válido.",
+      "password": "Informe uma senha."
+    },
+    "submit": "Entrar",
+    "loading": "Entrando…",
+    "logout": "Sair"
+  },
+  "home": {
+    "greetings": {
+      "first": {
+        "one": "Que bom ter você aqui, {{name}}!",
+        "two": "Boas-vindas, {{name}}!",
+        "three": "Prazer em receber você, {{name}}!",
+        "four": "Olá, {{name}}! Este é seu primeiro acesso.",
+        "five": "É um prazer conhecer você, {{name}}!"
+      },
+      "returning": {
+        "one": "Boas-vindas de volta, {{name}}!",
+        "two": "Que bom ter você de volta, {{name}}!",
+        "three": "Olá de novo, {{name}}!",
+        "four": "Bom ver você por aqui outra vez, {{name}}!",
+        "five": "É bom reencontrar você, {{name}}!"
+      }
+    },
+    "metrics": {
+      "income": "Entradas",
+      "expenses": "Saídas",
+      "balance": "Saldo",
+      "comparison": "em relação ao mês passado"
+    },
+    "summary": {
+      "less": "Você gastou {{percent}} menos que em {{month}}.",
+      "more": "Você gastou {{percent}} mais que em {{month}}.",
+      "equal": "Você gastou o mesmo valor que em {{month}}."
+    },
+    "topExpenses": {
+      "title": "Maiores despesas do mês",
+      "empty": "Nenhuma despesa registrada neste mês."
+    }
   }
 }
