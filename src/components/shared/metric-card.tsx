@@ -17,10 +17,15 @@ type MetricCardProps = {
   value: string
   valueTone?: keyof typeof toneClasses
   variation?: number | null
+  variationTone?: 'higherIsBetter' | 'lowerIsBetter'
 }
 
-export function MetricCard({ title, icon: Icon, value, valueTone = 'neutral', variation }: MetricCardProps) {
+export function MetricCard({
+  title, icon: Icon, value, valueTone = 'neutral', variation, variationTone = 'higherIsBetter',
+}: MetricCardProps) {
   const { t } = useTranslation()
+  const effect = (variation ?? 0) * (variationTone === 'lowerIsBetter' ? -1 : 1)
+  const comparisonTone = effect > 0 ? 'positive' : effect < 0 ? 'negative' : 'neutral'
 
   return (
     <Card className="space-y-2 px-4 py-4 sm:px-5">
@@ -35,7 +40,7 @@ export function MetricCard({ title, icon: Icon, value, valueTone = 'neutral', va
         <p className="text-sm text-muted-foreground">
           {variation === null ? t('home.metrics.noComparison') : (
             <>
-              <span className={cn('font-medium tabular-nums', toneClasses[variation > 0 ? 'positive' : variation < 0 ? 'negative' : 'neutral'])}>
+              <span className={cn('font-medium tabular-nums', toneClasses[comparisonTone])}>
                 {formatPercent(variation, 'exceptZero')}
               </span>{' '}
               {t('home.metrics.comparison')}

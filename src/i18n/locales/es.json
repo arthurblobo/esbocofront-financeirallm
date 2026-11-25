@@ -42,6 +42,10 @@
     "logout": "Cerrar sesión"
   },
   "home": {
+    "pending": {
+      "title": "El extracto de este mes está pendiente",
+      "description": "Importa el extracto de este mes para consultar los ingresos, los gastos y el saldo."
+    },
     "greetings": {
       "first": {
         "one": "¡Qué gusto tenerte aquí, {{name}}!",
@@ -74,6 +78,65 @@
     "topExpenses": {
       "title": "Mayores gastos del mes",
       "empty": "No hay gastos registrados este mes."
+    }
+  },
+  "statement": {
+    "loading": "Cargando extractos…",
+    "months": {
+      "title": "Extractos por mes",
+      "year": "Año",
+      "future": "Este mes aún no ha comenzado.",
+      "unavailable": "No hay extracto para este período."
+    },
+    "status": {
+      "imported": "Importado",
+      "pending": "Pendiente",
+      "unavailable": "No disponible",
+      "processing": "Procesando"
+    },
+    "upload": {
+      "hint": "Arrastra un archivo CSV, OFX o PDF a esta área.",
+      "choose": "Seleccionar archivo",
+      "invalid": "Selecciona un solo archivo CSV, OFX o PDF.",
+      "processing": "Procesando el extracto…",
+      "complete": "Se importó el extracto de {{month}}."
+    },
+    "details": {
+      "title": "Extracto de {{month}}",
+      "chart": "Gastos por categoría",
+      "total": "Gasto total",
+      "noExpenses": "No hay gastos en este período.",
+      "transactions": "Transacciones del mes"
+    },
+    "categories": {
+      "title": "Gestionar categorías",
+      "select": "Categoría",
+      "new": "Nueva categoría",
+      "name": "Nombre de la categoría",
+      "color": "Color de la categoría",
+      "invalid": "Introduce un nombre para la categoría.",
+      "save": "Guardar categoría",
+      "create": "Crear categoría",
+      "saved": "Categoría guardada."
+    },
+    "assignment": {
+      "label": "Asignar categoría",
+      "choose": "Selecciona una categoría",
+      "apply": "Asignar"
+    },
+    "colors": {
+      "violet": "Violeta",
+      "blue": "Azul",
+      "teal": "Verde azulado",
+      "rose": "Rosa oscuro",
+      "amber": "Ámbar",
+      "pink": "Rosa",
+      "olive": "Oliva",
+      "slate": "Gris azulado",
+      "cyan": "Cian",
+      "emerald": "Esmeralda",
+      "indigo": "Índigo",
+      "brown": "Marrón"
     }
   }
 }
