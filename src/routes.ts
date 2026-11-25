@@ -9,8 +9,6 @@ export const pages = {
   settings: { to: '/configuracoes', title: 'nav.settings', icon: Settings },
 } as const
 
-export type PageTitle = (typeof pages)[keyof typeof pages]['title']
-
 export function getLoginDestination(state: unknown): string {
   const from = state && typeof state === 'object' && 'from' in state ? state.from : null
   return Object.values(pages).find(({ to }) => to === from)?.to ?? pages.home.to

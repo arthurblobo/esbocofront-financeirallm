@@ -54,7 +54,7 @@ export function DonutChart({ segments, totalLabel, emptyLabel }: DonutChartProps
                 <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
                 <span className="min-w-0">{label}</span>
               </span>
-              <span className="text-right tabular-nums">
+              <span className="flex flex-wrap items-baseline justify-end gap-x-2 text-right tabular-nums @xl:block">
                 {formatCents(amountInCents)}
                 <span className="block text-xs text-muted-foreground">{formatPercent(amountInCents / total)}</span>
               </span>

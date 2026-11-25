@@ -83,6 +83,34 @@
       "empty": "Nenhuma despesa registrada neste mês."
     }
   },
+  "dashboard": {
+    "loading": "Carregando o dashboard…",
+    "metrics": {
+      "income": "Total de entradas",
+      "expenses": "Total de saídas",
+      "balance": "Saldo acumulado",
+      "count": "Nº de transações"
+    },
+    "period": {
+      "range": "{{start}} a {{end}}",
+      "label": "Período",
+      "options": {
+        "3": "Últimos 3 meses",
+        "6": "Últimos 6 meses",
+        "12": "Últimos 12 meses",
+        "all": "Tudo"
+      }
+    },
+    "trend": {
+      "missingCount_one": "{{count}} mês sem extrato importado.",
+      "missingCount_other": "{{count}} meses sem extrato importado.",
+      "title": "Entradas e saídas por mês",
+      "table": "Ver dados em tabela",
+      "month": "Mês",
+      "missing": "Sem extrato importado",
+      "empty": "Não há extratos importados neste período."
+    }
+  },
   "statement": {
     "loading": "Carregando extratos…",
     "months": {
@@ -139,6 +167,7 @@
       "slate": "Cinza-azulado",
       "cyan": "Ciano",
       "emerald": "Esmeralda",
+      "indigo": "Índigo",
       "fuchsia": "Fúcsia",
       "brown": "Marrom"
     }

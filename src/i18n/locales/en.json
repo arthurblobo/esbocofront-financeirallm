@@ -83,6 +83,34 @@
       "empty": "No expenses recorded this month."
     }
   },
+  "dashboard": {
+    "loading": "Loading the dashboard…",
+    "metrics": {
+      "income": "Total income",
+      "expenses": "Total expenses",
+      "balance": "Cumulative balance",
+      "count": "Transaction count"
+    },
+    "period": {
+      "range": "{{start}} to {{end}}",
+      "label": "Period",
+      "options": {
+        "3": "Last 3 months",
+        "6": "Last 6 months",
+        "12": "Last 12 months",
+        "all": "All time"
+      }
+    },
+    "trend": {
+      "missingCount_one": "{{count}} month without an imported statement.",
+      "missingCount_other": "{{count}} months without an imported statement.",
+      "title": "Monthly income and expenses",
+      "table": "View data as a table",
+      "month": "Month",
+      "missing": "No imported statement",
+      "empty": "There are no imported statements in this period."
+    }
+  },
   "statement": {
     "loading": "Loading statements…",
     "months": {
@@ -139,6 +167,7 @@
       "slate": "Slate",
       "cyan": "Cyan",
       "emerald": "Emerald",
+      "indigo": "Indigo",
       "fuchsia": "Fuchsia",
       "brown": "Brown"
     }
