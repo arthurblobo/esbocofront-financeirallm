@@ -3,17 +3,17 @@ import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { CategoryManager } from '@/components/shared/category-manager'
-import { DonutChart, type DonutSegment } from '@/components/shared/donut-chart'
+import { DonutChart } from '@/components/shared/donut-chart'
 import { StatementUpload } from '@/components/shared/statement-upload'
 import { TransactionRow } from '@/components/shared/transaction-row'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { categoryPalette } from '@/lib/category-palette'
 import {
   assignTransactionCategory, getCategoryLabel, getStatementMonthStatus, startStatementImport,
   UNCATEGORIZED_ID, useCategories, useStatementMonths, useTransactions, type Category, type Transaction,
 } from '@/lib/data'
 import { toLocalDateKey } from '@/lib/dates'
+import { getExpenseSegments } from '@/lib/expense-segments'
 import { formatDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
@@ -65,21 +65,7 @@ export function ImportPage() {
   const monthLabel = formatDate(`${selectedMonth}-01`, { month: 'long', year: 'numeric' })
   const monthTransactions = transactions.filter(({ date }) => date.startsWith(selectedMonth))
   const categoryById = new Map(categories.map((category) => [category.id, category]))
-  const expenses = new Map<string, DonutSegment>()
-  for (const transaction of monthTransactions) {
-    if (transaction.type !== 'expense') continue
-
-    const category = categoryById.get(transaction.categoryId) ?? categoryById.get(UNCATEGORIZED_ID)
-    const id = category?.id ?? UNCATEGORIZED_ID
-    const previous = expenses.get(id)
-    expenses.set(id, {
-      id,
-      label: category ? getCategoryLabel(category, t) : t('categories.uncategorized'),
-      color: category?.color ?? categoryPalette.slate,
-      amountInCents: (previous?.amountInCents ?? 0) + transaction.amountInCents,
-    })
-  }
-  const segments = [...expenses.values()].sort((a, b) => b.amountInCents - a.amountInCents)
+  const segments = getExpenseSegments(monthTransactions, categories, t)
 
   useLayoutEffect(() => {
     const completed = [...startedUploads.current].filter((month) => getStatementMonthStatus(calendar, month) === 'imported')

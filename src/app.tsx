@@ -7,10 +7,10 @@ import { useSession } from '@/lib/session'
 import { HomePage } from '@/pages/home-page'
 import { LoginPage } from '@/pages/login-page'
 import { SettingsPage } from '@/pages/settings-page'
-import { TitlePage } from '@/pages/title-page'
 import { getLoginDestination, LOGIN_PATH, pages } from '@/routes'
 
 const ImportPage = lazy(() => import('@/pages/import-page').then(({ ImportPage }) => ({ default: ImportPage })))
+const DashboardPage = lazy(() => import('@/pages/dashboard-page').then(({ DashboardPage }) => ({ default: DashboardPage })))
 
 function AppRoutes() {
   const { t } = useTranslation()
@@ -31,7 +31,11 @@ function AppRoutes() {
             <ImportPage />
           </Suspense>
         } />
-        <Route path={pages.dashboard.to} element={<TitlePage title={pages.dashboard.title} />} />
+        <Route path={pages.dashboard.to} element={
+          <Suspense fallback={<p role="status">{t('dashboard.loading')}</p>}>
+            <DashboardPage />
+          </Suspense>
+        } />
         <Route path="*" element={<Navigate to={pages.home.to} replace />} />
       </Route>
     </Routes>
