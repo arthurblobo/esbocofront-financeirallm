@@ -12,7 +12,7 @@ type Greeting = {
   changedAt: number
 }
 
-let currentGreeting = readGreeting()
+let currentGreeting: Greeting | null = null
 
 function readGreeting(): Greeting | null {
   const saved = readStorage(greetingKey)
@@ -34,15 +34,15 @@ function readGreeting(): Greeting | null {
 
 export function getGreeting(user: User, now = Date.now()) {
   const group = user.loginCount === 1 ? 'first' : 'returning'
-  if (
-    currentGreeting?.loginCount === user.loginCount &&
-    currentGreeting.lastLoginAt === user.lastLoginAt &&
-    now - currentGreeting.changedAt < GREETING_TTL_MINUTES * 60_000
-  ) {
-    return `home.greetings.${group}.${currentGreeting.option}` as const
+  const previous = readGreeting() ?? currentGreeting
+  if (previous?.loginCount === user.loginCount && previous.lastLoginAt === user.lastLoginAt) {
+    const age = now - previous.changedAt
+    if (age >= 0 && age < GREETING_TTL_MINUTES * 60_000) {
+      return `home.greetings.${group}.${previous.option}` as const
+    }
   }
 
-  const options = greetingOptions.filter((option) => option !== currentGreeting?.option)
+  const options = greetingOptions.filter((option) => option !== previous?.option)
   const option = options[Math.floor(Math.random() * options.length)]
   currentGreeting = { option, loginCount: user.loginCount, lastLoginAt: user.lastLoginAt, changedAt: now }
   writeStorage(greetingKey, JSON.stringify(currentGreeting))

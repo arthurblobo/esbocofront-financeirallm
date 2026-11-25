@@ -24,7 +24,11 @@ function getMonthTotals(transactions: readonly Transaction[], start: Date, end: 
 }
 
 export function getVariation(current: number, previous: number, previousHasData: boolean) {
-  return previousHasData && previous !== 0 ? (current - previous) / Math.abs(previous) : null
+  if (!previousHasData) return null
+  if (previous === 0) return current === 0 ? 0 : null
+
+  const variation = (current - previous) / Math.abs(previous)
+  return Math.round(variation * 1000) / 1000 + 0
 }
 
 export function getMonthSummary(transactions: readonly Transaction[], today: Date) {

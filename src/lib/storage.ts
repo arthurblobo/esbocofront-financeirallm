@@ -9,15 +9,16 @@ export function readStorage(key: string): string | null {
   }
 }
 
-export function writeStorage(key: string, value: string): void {
+export function writeStorage(key: string, value: string): boolean {
   const prefixedKey = STORAGE_PREFIX + key
   try {
     window.localStorage.setItem(prefixedKey, value)
   } catch {
     // The app still works when persistence is unavailable.
-    return
+    return false
   }
   storageChanges.dispatchEvent(new Event(prefixedKey))
+  return true
 }
 
 export function subscribeStorage(key: string, listener: () => void): () => void {

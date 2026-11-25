@@ -59,12 +59,14 @@
       }
     },
     "metrics": {
+      "noComparison": "Sin comparación con el mes pasado",
       "income": "Ingresos",
       "expenses": "Gastos",
       "balance": "Saldo",
       "comparison": "respecto al mes pasado"
     },
     "summary": {
+      "noComparison": "No hay gastos en {{month}} para comparar.",
       "less": "Gastaste un {{percent}} menos que en {{month}}.",
       "more": "Gastaste un {{percent}} más que en {{month}}.",
       "equal": "Gastaste lo mismo que en {{month}}."

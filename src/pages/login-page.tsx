@@ -1,29 +1,43 @@
 import { LoaderCircle, Wallet } from 'lucide-react'
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
+import { useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 
+import { FormField } from '@/components/shared/form-field'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { login } from '@/lib/session'
+import { getLoginDestination } from '@/routes'
 
 const fields = [
   { name: 'name', type: 'text', autoComplete: 'name' },
   { name: 'email', type: 'email', autoComplete: 'email' },
   { name: 'password', type: 'password', autoComplete: 'current-password' },
 ] as const
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 type Field = (typeof fields)[number]['name']
 
-export function LoginPage({ onLogin }: { onLogin: (name: string, email: string) => void }) {
+export function LoginPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const navigationType = useNavigationType()
   const [errors, setErrors] = useState<Partial<Record<Field, boolean>>>({})
   const [loading, setLoading] = useState(false)
   const timer = useRef<number | undefined>(undefined)
+  const heading = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
+  useLayoutEffect(() => {
+    if (navigationType !== 'POP' && location.state?.focusAfterAuth) heading.current?.focus()
+  }, [location, navigationType])
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (loading) return
+    if (timer.current !== undefined) return
 
     const form = event.currentTarget
     const nameInput = form.elements.namedItem('name') as HTMLInputElement
@@ -33,8 +47,8 @@ export function LoginPage({ onLogin }: { onLogin: (name: string, email: string) 
     const email = emailInput.value.trim()
     const nextErrors = {
       name: !name,
-      email: !email || emailInput.validity.typeMismatch,
-      password: !passwordInput.value,
+      email: emailInput.validity.typeMismatch || !emailPattern.test(email),
+      password: !passwordInput.value.trim(),
     }
 
     setErrors(nextErrors)
@@ -46,7 +60,12 @@ export function LoginPage({ onLogin }: { onLogin: (name: string, email: string) 
     }
 
     setLoading(true)
-    timer.current = window.setTimeout(() => onLogin(name, email), 450)
+    timer.current = window.setTimeout(() => {
+      flushSync(() => {
+        login(name, email)
+        void navigate(getLoginDestination(location.state), { replace: true, state: { focusAfterAuth: true } })
+      })
+    }, 450)
   }
 
   return (
@@ -59,37 +78,36 @@ export function LoginPage({ onLogin }: { onLogin: (name: string, email: string) 
             </span>
             {t('app.name')}
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t('login.title')}</h1>
+          <h1
+            ref={heading}
+            tabIndex={-1}
+            className="rounded-sm text-2xl font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            {t('login.title')}
+          </h1>
         </header>
         <form className="space-y-4" noValidate onSubmit={submit} aria-busy={loading}>
           {fields.map(({ name, type, autoComplete }) => (
-            <div key={name} className="space-y-1.5">
-              <label className="block text-sm font-medium" htmlFor={`login-${name}`}>
-                {t(`login.fields.${name}`)}
-              </label>
-              <input
-                id={`login-${name}`}
-                className="h-11 w-full rounded-md border border-input bg-background px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background aria-invalid:border-negative"
-                name={name}
-                type={type}
-                autoComplete={autoComplete}
-                required
-                readOnly={loading}
-                aria-invalid={errors[name] || undefined}
-                aria-describedby={errors[name] ? `login-${name}-error` : undefined}
-              />
-              {errors[name] && (
-                <p id={`login-${name}-error`} className="text-sm text-negative" role="alert">
-                  {t(`login.errors.${name}`)}
-                </p>
-              )}
-            </div>
+            <FormField
+              key={name}
+              id={`login-${name}`}
+              label={t(`login.fields.${name}`)}
+              error={errors[name] ? t(`login.errors.${name}`) : undefined}
+              name={name}
+              type={type}
+              autoComplete={autoComplete}
+              required
+              readOnly={loading}
+              onChange={() => {
+                if (errors[name]) setErrors((previous) => ({ ...previous, [name]: false }))
+              }}
+            />
           ))}
           <Button
             type="submit"
             variant="primary"
-            className="mt-2 w-full"
-            disabled={loading}
+            className="mt-2 w-full aria-disabled:pointer-events-none aria-disabled:opacity-50"
+            aria-disabled={loading}
             aria-label={t(loading ? 'login.loading' : 'login.submit')}
           >
             {loading && <LoaderCircle aria-hidden="true" className="motion-safe:animate-spin" />}
