@@ -1,0 +1,28 @@
+{
+  "app": {
+    "name": "Finanzas Familiares"
+  },
+  "nav": {
+    "label": "Navegación principal",
+    "home": "Inicio",
+    "import": "Importar extracto",
+    "dashboard": "Panel general",
+    "settings": "Configuración",
+    "open": "Abrir menú",
+    "close": "Cerrar menú"
+  },
+  "theme": {
+    "light": "Activar tema claro",
+    "dark": "Activar tema oscuro"
+  },
+  "categories": {
+    "food": "Alimentación",
+    "housing": "Vivienda",
+    "transport": "Transporte",
+    "health": "Salud",
+    "leisure": "Ocio",
+    "subscriptions": "Suscripciones",
+    "education": "Educación",
+    "uncategorized": "Sin categoría"
+  }
+}

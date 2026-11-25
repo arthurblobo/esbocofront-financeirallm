@@ -1,0 +1,28 @@
+{
+  "app": {
+    "name": "Family Finances"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "home": "Home",
+    "import": "Import statement",
+    "dashboard": "Overview",
+    "settings": "Settings",
+    "open": "Open menu",
+    "close": "Close menu"
+  },
+  "theme": {
+    "light": "Switch to light theme",
+    "dark": "Switch to dark theme"
+  },
+  "categories": {
+    "food": "Food",
+    "housing": "Housing",
+    "transport": "Transportation",
+    "health": "Health",
+    "leisure": "Leisure",
+    "subscriptions": "Subscriptions",
+    "education": "Education",
+    "uncategorized": "Uncategorized"
+  }
+}

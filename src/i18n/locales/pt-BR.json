@@ -1,0 +1,28 @@
+{
+  "app": {
+    "name": "Financeiro Familiar"
+  },
+  "nav": {
+    "label": "Navegação principal",
+    "home": "Início",
+    "import": "Importar extrato",
+    "dashboard": "Dashboard geral",
+    "settings": "Configurações",
+    "open": "Abrir menu",
+    "close": "Fechar menu"
+  },
+  "theme": {
+    "light": "Ativar tema claro",
+    "dark": "Ativar tema escuro"
+  },
+  "categories": {
+    "food": "Alimentação",
+    "housing": "Moradia",
+    "transport": "Transporte",
+    "health": "Saúde",
+    "leisure": "Lazer",
+    "subscriptions": "Assinaturas",
+    "education": "Educação",
+    "uncategorized": "Não identificado"
+  }
+}
