@@ -1,7 +1,7 @@
-# Escopo – Front do Financeiro Familiar (protótipo)
+# Escopo – Front do Financeiro (protótipo)
 
 ## Produto
-Sistema que importa extratos bancários de várias pessoas da família, categoriza as transações e mostra para onde o dinheiro vai, com um assistente de IA para perguntas sobre os dados.
+Sistema que importa os extratos bancários do usuário, categoriza as transações e mostra para onde o dinheiro vai, com um assistente de IA para perguntas sobre os dados.
 ESTE REPOSITÓRIO É SÓ O FRONT, UM PROTÓTIPO NAVEGÁVEL PARA TESTES COM CONHECIDOS. Não há backend: login, upload, categorização e IA são simulados com dados fixos (mocks) e persistidos em localStorage.
 
 ## Referência visual
