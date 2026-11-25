@@ -1,7 +1,7 @@
 import { Menu, Moon, Sun, Wallet, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigationType } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
 import { saveTheme, useTheme } from '@/lib/theme'
@@ -44,11 +44,17 @@ function Brand() {
 export function AppLayout() {
   const { t } = useTranslation()
   const isDark = useTheme() === 'dark'
-  const { pathname } = useLocation()
+  const location = useLocation()
+  const { pathname } = location
+  const navigationType = useNavigationType()
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButton = useRef<HTMLButtonElement>(null)
   const main = useRef<HTMLElement>(null)
   const focusMainAfterNavigation = useRef(false)
+
+  useLayoutEffect(() => {
+    if (navigationType !== 'POP' && location.state?.focusAfterAuth) main.current?.focus()
+  }, [location, navigationType])
 
   useLayoutEffect(() => {
     setMenuOpen(false)

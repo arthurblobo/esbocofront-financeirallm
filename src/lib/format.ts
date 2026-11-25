@@ -17,3 +17,11 @@ export function formatDate(
   return new Intl.DateTimeFormat(i18n.resolvedLanguage ?? defaultLanguage, options)
     .format(typeof date === 'string' ? parseLocalDate(date) : date)
 }
+
+export function formatPercent(value: number, signDisplay: Intl.NumberFormatOptions['signDisplay'] = 'auto'): string {
+  return new Intl.NumberFormat(i18n.resolvedLanguage ?? defaultLanguage, {
+    style: 'percent',
+    maximumFractionDigits: 1,
+    signDisplay,
+  }).format(value)
+}

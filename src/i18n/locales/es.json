@@ -24,5 +24,56 @@
     "subscriptions": "Suscripciones",
     "education": "Educación",
     "uncategorized": "Sin categoría"
+  },
+  "login": {
+    "title": "Accede a tu cuenta",
+    "fields": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "password": "Contraseña"
+    },
+    "errors": {
+      "name": "Introduce tu nombre.",
+      "email": "Introduce un correo electrónico válido.",
+      "password": "Introduce una contraseña."
+    },
+    "submit": "Iniciar sesión",
+    "loading": "Iniciando sesión…",
+    "logout": "Cerrar sesión"
+  },
+  "home": {
+    "greetings": {
+      "first": {
+        "one": "¡Qué gusto tenerte aquí, {{name}}!",
+        "two": "¡Te damos la bienvenida, {{name}}!",
+        "three": "¡Es un placer recibirte, {{name}}!",
+        "four": "¡Hola, {{name}}! Esta es tu primera visita.",
+        "five": "¡Es un gusto conocerte, {{name}}!"
+      },
+      "returning": {
+        "one": "¡Te damos la bienvenida de nuevo, {{name}}!",
+        "two": "¡Qué gusto que hayas vuelto, {{name}}!",
+        "three": "¡Hola de nuevo, {{name}}!",
+        "four": "¡Qué bien verte por aquí otra vez, {{name}}!",
+        "five": "¡Es un placer volver a verte, {{name}}!"
+      }
+    },
+    "metrics": {
+      "noComparison": "Sin comparación con el mes pasado",
+      "income": "Ingresos",
+      "expenses": "Gastos",
+      "balance": "Saldo",
+      "comparison": "respecto al mes pasado"
+    },
+    "summary": {
+      "noComparison": "No hay gastos en {{month}} para comparar.",
+      "less": "Gastaste un {{percent}} menos que en {{month}}.",
+      "more": "Gastaste un {{percent}} más que en {{month}}.",
+      "equal": "Gastaste lo mismo que en {{month}}."
+    },
+    "topExpenses": {
+      "title": "Mayores gastos del mes",
+      "empty": "No hay gastos registrados este mes."
+    }
   }
 }

@@ -24,5 +24,56 @@
     "subscriptions": "Subscriptions",
     "education": "Education",
     "uncategorized": "Uncategorized"
+  },
+  "login": {
+    "title": "Sign in to your account",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password"
+    },
+    "errors": {
+      "name": "Enter your name.",
+      "email": "Enter a valid email address.",
+      "password": "Enter a password."
+    },
+    "submit": "Sign in",
+    "loading": "Signing in…",
+    "logout": "Sign out"
+  },
+  "home": {
+    "greetings": {
+      "first": {
+        "one": "Glad you're here, {{name}}!",
+        "two": "Welcome, {{name}}!",
+        "three": "It's a pleasure to have you here, {{name}}!",
+        "four": "Hello, {{name}}! This is your first visit.",
+        "five": "Nice to meet you, {{name}}!"
+      },
+      "returning": {
+        "one": "Welcome back, {{name}}!",
+        "two": "Glad you're back, {{name}}!",
+        "three": "Hello again, {{name}}!",
+        "four": "Good to see you here again, {{name}}!",
+        "five": "It's a pleasure to see you again, {{name}}!"
+      }
+    },
+    "metrics": {
+      "noComparison": "No comparison with last month",
+      "income": "Income",
+      "expenses": "Expenses",
+      "balance": "Balance",
+      "comparison": "compared with last month"
+    },
+    "summary": {
+      "noComparison": "There were no expenses in {{month}} to compare.",
+      "less": "You spent {{percent}} less than in {{month}}.",
+      "more": "You spent {{percent}} more than in {{month}}.",
+      "equal": "You spent the same amount as in {{month}}."
+    },
+    "topExpenses": {
+      "title": "Top expenses this month",
+      "empty": "No expenses recorded this month."
+    }
   }
 }

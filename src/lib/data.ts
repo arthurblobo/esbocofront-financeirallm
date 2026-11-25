@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react'
 
 import { defaultCategories, type Category } from '@/mocks/categories'
 import { createTransactions, type Transaction } from '@/mocks/transactions'
+import { toLocalDateKey } from './dates'
 import { readStorage, subscribeStorage } from './storage'
 
 export { getCategoryLabel, UNCATEGORIZED_ID } from '@/mocks/categories'
@@ -9,7 +10,8 @@ export type { Category, CategoryId } from '@/mocks/categories'
 export type { Transaction } from '@/mocks/transactions'
 
 const categoriesKey = 'categories'
-const transactions = createTransactions()
+let transactionsDay: string | undefined
+let transactionsSnapshot: readonly Transaction[] = []
 let categoriesValue: string | null = null
 let categoriesSnapshot = defaultCategories
 
@@ -55,8 +57,26 @@ function subscribeCategories(listener: () => void) {
   return subscribeStorage(categoriesKey, listener)
 }
 
-const getTransactionsSnapshot = () => transactions
-const subscribeTransactions = () => () => {}
+function getTransactionsSnapshot() {
+  const today = new Date()
+  const day = toLocalDateKey(today)
+
+  if (day !== transactionsDay) {
+    transactionsDay = day
+    transactionsSnapshot = createTransactions(today)
+  }
+
+  return transactionsSnapshot
+}
+
+function subscribeTransactions(listener: () => void) {
+  document.addEventListener('visibilitychange', listener)
+  window.addEventListener('focus', listener)
+  return () => {
+    document.removeEventListener('visibilitychange', listener)
+    window.removeEventListener('focus', listener)
+  }
+}
 
 export function useTransactions(): readonly Transaction[] {
   return useSyncExternalStore(subscribeTransactions, getTransactionsSnapshot)
