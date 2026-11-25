@@ -14,3 +14,13 @@ Escreva sempre em review/fatia-N.md, no formato:
 ## Fora do escopo notado (não corrigir agora)
 
 Ordene por severidade. BLOQUEANTE = viola o escopo, quebra o build, quebra a navegação ou cria um padrão errado que vai se repetir nas próximas fatias. Seja específico; nada de "melhorar o código".
+
+## Processos e ambiente
+- Todo servidor aberto para testar (vite, vite preview, Playwright) deve ser
+  encerrado ao final da tarefa, junto com os processos filhos.
+- Confirme o encerramento verificando que a porta usada ficou livre.
+- Nunca encerre processos que você não abriu (Codex, outros apps).
+- Use sempre a mesma porta para preview (4173) e para dev (5173), com --strictPort.
+  Se a porta estiver ocupada, pare e me avise em vez de trocar de porta.
+- Ao trabalhar em git worktree, rode npm ci dentro do próprio worktree; nunca
+  compartilhe node_modules entre pastas.
