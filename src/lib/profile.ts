@@ -1,10 +1,10 @@
 import { useSyncExternalStore } from 'react'
 
-import { phoneDigits } from './phone'
+import { isValidPhone, phoneDigits } from './phone'
 import { readStorage, subscribeStorage, writeStorage } from './storage'
 
-type Profile = { phone: string; photo: string | null }
-const emptyProfile: Profile = { phone: '', photo: null }
+type Profile = { name: string | null; phone: string; photo: string | null }
+const emptyProfile: Profile = { name: null, phone: '', photo: null }
 const photoPattern = /^data:image\/(?:webp|png);base64,[a-z0-9+/=]+$/i
 const profiles = new Map<string, ReturnType<typeof createProfileStore>>()
 
@@ -14,7 +14,8 @@ function parseProfile(saved: string | null): Profile {
   try {
     const value = JSON.parse(saved)
     return {
-      phone: typeof value.phone === 'string' && /^(?:\d{10,11})?$/.test(value.phone) ? value.phone : '',
+      name: typeof value.name === 'string' && value.name.trim() ? value.name.trim() : null,
+      phone: typeof value.phone === 'string' && isValidPhone(value.phone) ? value.phone : '',
       photo: typeof value.photo === 'string' && photoPattern.test(value.photo) ? value.photo : null,
     }
   } catch {
@@ -25,7 +26,6 @@ function parseProfile(saved: string | null): Profile {
 function createProfileStore(key: string) {
   let savedValue: string | null | undefined
   let snapshot = emptyProfile
-  const listeners = new Set<() => void>()
 
   function getSnapshot() {
     const saved = readStorage(key)
@@ -37,31 +37,26 @@ function createProfileStore(key: string) {
   }
 
   function subscribe(listener: () => void) {
-    listeners.add(listener)
-    const unsubscribe = subscribeStorage(key, listener)
-    return () => {
-      listeners.delete(listener)
-      unsubscribe()
-    }
+    return subscribeStorage(key, listener)
   }
 
   function savePhone(value: string) {
     const current = getSnapshot()
     const phone = phoneDigits(value)
-    return phone === current.phone || writeStorage(key, JSON.stringify({ ...current, phone }))
+    return isValidPhone(phone) && (phone === current.phone || writeStorage(key, JSON.stringify({ ...current, phone })))
   }
 
   function savePhoto(photo: string | null) {
     const current = getSnapshot()
-    if (current.photo === photo) return true
-    if (writeStorage(key, JSON.stringify({ ...current, photo }))) return true
-
-    snapshot = { ...current, photo: null }
-    listeners.forEach((listener) => listener())
-    return false
+    return current.photo === photo || writeStorage(key, JSON.stringify({ ...current, photo }))
   }
 
-  return { getSnapshot, subscribe, savePhone, savePhoto }
+  function saveName(name: string | null) {
+    const current = getSnapshot()
+    return current.name === name || writeStorage(key, JSON.stringify({ ...current, name }))
+  }
+
+  return { getSnapshot, subscribe, savePhone, savePhoto, saveName }
 }
 
 function getProfileStore(email: string) {
@@ -80,6 +75,14 @@ const subscribeEmptyProfile = () => () => {}
 export function useProfile(email?: string): Profile {
   const store = email ? getProfileStore(email) : undefined
   return useSyncExternalStore(store?.subscribe ?? subscribeEmptyProfile, store?.getSnapshot ?? readEmptyProfile)
+}
+
+export function getProfileName(email: string): string | null {
+  return getProfileStore(email).getSnapshot().name
+}
+
+export function saveProfileName(email: string, name: string | null): boolean {
+  return getProfileStore(email).saveName(name)
 }
 
 export function saveProfilePhone(email: string, phone: string): boolean {

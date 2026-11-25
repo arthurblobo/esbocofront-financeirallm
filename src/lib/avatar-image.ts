@@ -1,4 +1,4 @@
-const maxPhotoBytes = 5_000_000
+const maxPhotoBytes = 5 * 1024 * 1024
 const avatarSize = 128
 
 type PhotoResult =
@@ -10,11 +10,9 @@ export async function resizeAvatar(file: File): Promise<PhotoResult> {
 
   try {
     const header = new Uint8Array(await file.slice(0, 12).arrayBuffer())
-    const isJpeg = /\.jpe?g$/i.test(file.name) && header[0] === 255 && header[1] === 216 && header[2] === 255
-    const isPng = /\.png$/i.test(file.name) &&
-      [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => header[index] === byte)
-    const isWebp = /\.webp$/i.test(file.name) &&
-      String.fromCharCode(...header.slice(0, 4)) === 'RIFF' && String.fromCharCode(...header.slice(8, 12)) === 'WEBP'
+    const isJpeg = header[0] === 255 && header[1] === 216 && header[2] === 255
+    const isPng = [137, 80, 78, 71, 13, 10, 26, 10].every((byte, index) => header[index] === byte)
+    const isWebp = String.fromCharCode(...header.slice(0, 4)) === 'RIFF' && String.fromCharCode(...header.slice(8, 12)) === 'WEBP'
     if (!isJpeg && !isPng && !isWebp) return { ok: false, reason: 'photoType' }
 
     const image = await createImageBitmap(file)
@@ -26,6 +24,7 @@ export async function resizeAvatar(file: File): Promise<PhotoResult> {
       if (!context) return { ok: false, reason: 'photoRead' }
 
       const cropSize = Math.min(image.width, image.height)
+      context.imageSmoothingQuality = 'high'
       context.drawImage(
         image, (image.width - cropSize) / 2, (image.height - cropSize) / 2, cropSize, cropSize, 0, 0, avatarSize, avatarSize,
       )

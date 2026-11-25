@@ -94,6 +94,8 @@
       "birthDate": "Data de nascimento"
     },
     "locked": {
+      "demo": "CPF e data de nascimento são fictícios, apenas para demonstração.",
+      "masked": "parcialmente oculto",
       "title": "Dados bloqueados",
       "reason": "Esses dados ficam bloqueados para proteger você contra golpes. Para alterá-los, entre em contato com o suporte."
     },
@@ -121,11 +123,13 @@
     },
     "errors": {
       "nameRequired": "Informe seu nome.",
-      "phoneFormat": "Informe um telefone com DDD e 10 ou 11 dígitos.",
+      "phoneFormat": "Informe um telefone brasileiro válido com DDD.",
       "storage": "Não foi possível salvar a alteração neste navegador.",
       "photoType": "Escolha uma imagem JPG, PNG ou WebP.",
       "photoSize": "A imagem deve ter até 5 MB.",
       "photoRead": "Não foi possível abrir a imagem.",
+      "photoStorageKept": "Não foi possível salvar a nova foto. A foto atual foi mantida.",
+      "photoRemoveFailed": "Não foi possível remover a foto. A foto atual foi mantida.",
       "photoStorage": "Não foi possível salvar a foto neste navegador. O avatar exibe suas iniciais."
     },
     "languages": {

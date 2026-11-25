@@ -1,7 +1,7 @@
 import { createInstance } from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
-import { readStorage, writeStorage } from '@/lib/storage'
+import { readStorage, subscribeStorage, writeStorage } from '@/lib/storage'
 
 import en from './locales/en.json'
 import es from './locales/es.json'
@@ -24,7 +24,7 @@ export function isLanguage(value: string | null): value is Language {
 
 export function saveLanguage(language: Language): boolean {
   const saved = writeStorage('language', language)
-  void i18n.changeLanguage(language)
+  if (!saved) void i18n.changeLanguage(language)
   return saved
 }
 
@@ -52,4 +52,9 @@ export async function initializeI18n() {
 
   updateDocumentLanguage(i18n.resolvedLanguage ?? defaultLanguage)
   i18n.on('languageChanged', updateDocumentLanguage)
+  subscribeStorage('language', () => {
+    const saved = readStorage('language')
+    const language = isLanguage(saved) ? saved : defaultLanguage
+    if (language !== i18n.language) void i18n.changeLanguage(language)
+  })
 }

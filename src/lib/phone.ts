@@ -1,5 +1,13 @@
 export function phoneDigits(value: string): string {
-  return value.replace(/\D/g, '')
+  const digits = value.replace(/\D/g, '')
+  const local = (digits.length === 12 || digits.length === 13) && digits.startsWith('55')
+    ? digits.slice(2)
+    : digits
+  return local.slice(0, 11)
+}
+
+export function isValidPhone(digits: string): boolean {
+  return digits === '' || /^[1-9]{2}(?:9\d{8}|[2-5]\d{7})$/.test(digits)
 }
 
 export function formatPhone(value: string): string {

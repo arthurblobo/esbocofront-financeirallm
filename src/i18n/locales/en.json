@@ -94,6 +94,8 @@
       "birthDate": "Date of birth"
     },
     "locked": {
+      "demo": "CPF and date of birth are fictitious and provided for demonstration only.",
+      "masked": "partially hidden",
       "title": "Locked information",
       "reason": "This information is locked to protect you from scams. Contact support to change it."
     },
@@ -121,11 +123,13 @@
     },
     "errors": {
       "nameRequired": "Enter your name.",
-      "phoneFormat": "Enter a phone number with an area code and 10 or 11 digits.",
+      "phoneFormat": "Enter a valid Brazilian phone number with an area code.",
       "storage": "The change could not be saved in this browser.",
       "photoType": "Choose a JPG, PNG, or WebP image.",
       "photoSize": "The image must be 5 MB or smaller.",
       "photoRead": "The image could not be opened.",
+      "photoStorageKept": "The new photo could not be saved. Your current photo was kept.",
+      "photoRemoveFailed": "The photo could not be removed. Your current photo was kept.",
       "photoStorage": "The photo could not be saved in this browser. Your avatar displays your initials."
     },
     "languages": {

@@ -1,5 +1,6 @@
 import { LoaderCircle, LockKeyhole } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { flushSync } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { FormField } from '@/components/shared/form-field'
@@ -9,14 +10,13 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { resizeAvatar } from '@/lib/avatar-image'
 import { mockProfile } from '@/lib/data'
-import { formatDate } from '@/lib/format'
-import { formatPhone, phoneDigits } from '@/lib/phone'
+import { formatPhone, isValidPhone, phoneDigits } from '@/lib/phone'
 import { saveProfilePhone, saveProfilePhoto, useProfile } from '@/lib/profile'
 import { updateSessionName, type User } from '@/lib/session'
 
 type FieldError = 'nameRequired' | 'phoneFormat' | 'storage'
-type PhotoError = 'photoType' | 'photoSize' | 'photoRead' | 'photoStorage'
-type Status = 'profileSaved' | 'photoSaved' | 'photoRemoved' | 'photoProcessing'
+type PhotoError = 'photoType' | 'photoSize' | 'photoRead' | 'photoStorage' | 'photoStorageKept' | 'photoRemoveFailed'
+type PhotoStatus = 'photoSaved' | 'photoRemoved' | 'photoProcessing'
 
 export function ProfileSettings({ user }: { user: User }) {
   const { t } = useTranslation()
@@ -25,7 +25,8 @@ export function ProfileSettings({ user }: { user: User }) {
   const [draftPhone, setDraftPhone] = useState<string>()
   const [errors, setErrors] = useState<{ name?: FieldError; phone?: FieldError }>({})
   const [photoError, setPhotoError] = useState<PhotoError>()
-  const [status, setStatus] = useState<Status>()
+  const [profileSaved, setProfileSaved] = useState(false)
+  const [photoStatus, setPhotoStatus] = useState<PhotoStatus>()
   const [processing, setProcessing] = useState(false)
   const nameInput = useRef<HTMLInputElement>(null)
   const phoneInput = useRef<HTMLInputElement>(null)
@@ -41,16 +42,16 @@ export function ProfileSettings({ user }: { user: User }) {
 
   function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setStatus(undefined)
+    flushSync(() => setProfileSaved(false))
     const trimmedName = name.trim()
     const digits = phoneDigits(phone)
     const nextErrors: typeof errors = {
       name: trimmedName ? undefined : 'nameRequired',
-      phone: digits && !/^\d{10,11}$/.test(digits) ? 'phoneFormat' : undefined,
+      phone: !isValidPhone(digits) ? 'phoneFormat' : undefined,
     }
 
     if (!nextErrors.name && !nextErrors.phone) {
-      if (updateSessionName(trimmedName)) setDraftName(undefined)
+      if (draftName === undefined || updateSessionName(trimmedName)) setDraftName(undefined)
       else nextErrors.name = 'storage'
 
       if (saveProfilePhone(user.email, digits)) setDraftPhone(undefined)
@@ -60,42 +61,42 @@ export function ProfileSettings({ user }: { user: User }) {
     setErrors(nextErrors)
     if (nextErrors.name) nameInput.current?.focus()
     else if (nextErrors.phone) phoneInput.current?.focus()
-    else setStatus('profileSaved')
+    else setProfileSaved(true)
   }
 
   async function choosePhoto(file: File) {
     const request = ++photoRequest.current
     setProcessing(true)
     setPhotoError(undefined)
-    setStatus('photoProcessing')
+    setPhotoStatus('photoProcessing')
     const result = await resizeAvatar(file)
     if (request !== photoRequest.current) return
 
     setProcessing(false)
-    setStatus(undefined)
+    setPhotoStatus(undefined)
     if (!result.ok) {
       setPhotoError(result.reason)
       return
     }
 
-    if (saveProfilePhoto(user.email, result.photo)) setStatus('photoSaved')
-    else setPhotoError('photoStorage')
+    if (saveProfilePhoto(user.email, result.photo)) setPhotoStatus('photoSaved')
+    else setPhotoError(profile.photo ? 'photoStorageKept' : 'photoStorage')
   }
 
   function removePhoto() {
     if (processing) return
 
     setPhotoError(undefined)
-    setStatus(undefined)
+    setPhotoStatus(undefined)
     photoButton.current?.focus()
-    if (saveProfilePhoto(user.email, null)) setStatus('photoRemoved')
-    else setPhotoError('photoStorage')
+    if (saveProfilePhoto(user.email, null)) setPhotoStatus('photoRemoved')
+    else setPhotoError('photoRemoveFailed')
   }
 
   const lockedFields = [
-    { key: 'email', value: user.email },
-    { key: 'cpf', value: mockProfile.maskedCpf },
-    { key: 'birthDate', value: formatDate(mockProfile.birthDate, { day: '2-digit', month: '2-digit', year: 'numeric' }) },
+    { key: 'email', value: user.email, masked: false },
+    { key: 'cpf', value: mockProfile.maskedCpf, masked: true },
+    { key: 'birthDate', value: mockProfile.maskedBirthDate, masked: true },
   ] as const
 
   return (
@@ -136,6 +137,9 @@ export function ProfileSettings({ user }: { user: User }) {
               </Button>
             )}
           </div>
+          <p role="status" className="empty:sr-only text-sm text-muted-foreground">
+            {photoStatus ? t(`settings.status.${photoStatus}`) : ''}
+          </p>
           {photoError && <p id="profile-photo-error" role="alert" className="text-sm text-negative">{t(`settings.errors.${photoError}`)}</p>}
         </div>
       </div>
@@ -152,7 +156,7 @@ export function ProfileSettings({ user }: { user: User }) {
           onChange={(event) => {
             setDraftName(event.currentTarget.value)
             setErrors((previous) => ({ ...previous, name: undefined }))
-            setStatus(undefined)
+            setProfileSaved(false)
           }}
         />
         <FormField
@@ -166,28 +170,32 @@ export function ProfileSettings({ user }: { user: User }) {
           onChange={(event) => {
             setDraftPhone(formatPhone(event.currentTarget.value))
             setErrors((previous) => ({ ...previous, phone: undefined }))
-            setStatus(undefined)
+            setProfileSaved(false)
           }}
         />
         <Button type="submit" variant="primary" aria-label={t('settings.save')}>{t('settings.save')}</Button>
       </form>
 
-      <p role="status" className="empty:sr-only text-sm text-muted-foreground">{status ? t(`settings.status.${status}`) : ''}</p>
+      <p role="status" className="empty:sr-only text-sm text-muted-foreground">{profileSaved ? t('settings.status.profileSaved') : ''}</p>
 
       <section aria-labelledby="profile-locked" className="space-y-3 border-t border-border pt-5">
         <h3 id="profile-locked" className="text-sm font-semibold">{t('settings.locked.title')}</h3>
         <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {lockedFields.map(({ key, value }) => (
+          {lockedFields.map(({ key, value, masked }) => (
             <div className="min-w-0 space-y-1 rounded-md border border-border bg-muted px-3 py-2" key={key}>
               <dt className="flex items-center gap-2 text-sm text-muted-foreground">
                 <LockKeyhole aria-hidden="true" className="size-4 shrink-0" />
                 {t(`settings.fields.${key}`)}
               </dt>
-              <dd className="wrap-anywhere text-sm font-medium">{value}</dd>
+              <dd className="wrap-anywhere text-sm font-medium">
+                {value}
+                {masked && <span className="sr-only"> {t('settings.locked.masked')}</span>}
+              </dd>
             </div>
           ))}
         </dl>
         <p className="text-sm text-muted-foreground">{t('settings.locked.reason')}</p>
+        <p className="text-sm text-muted-foreground">{t('settings.locked.demo')}</p>
       </section>
     </Card>
   )
