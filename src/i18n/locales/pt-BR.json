@@ -1,6 +1,8 @@
 {
   "app": {
-    "name": "Financeiro"
+    "name": "Financeiro",
+    "routeError": "Não foi possível carregar a página.",
+    "reload": "Recarregar página"
   },
   "nav": {
     "label": "Navegação principal",
@@ -42,6 +44,10 @@
     "logout": "Sair"
   },
   "home": {
+    "pending": {
+      "title": "Extrato do mês pendente",
+      "description": "Importe o extrato deste mês para acompanhar entradas, saídas e saldo."
+    },
     "greetings": {
       "first": {
         "one": "Que bom ter você aqui, {{name}}!",
@@ -66,6 +72,7 @@
       "comparison": "em relação ao mês passado"
     },
     "summary": {
+      "previousPending": "Importe o extrato de {{month}} para comparar.",
       "noComparison": "Não há gastos em {{month}} para comparar.",
       "less": "Você gastou {{percent}} menos que em {{month}}.",
       "more": "Você gastou {{percent}} mais que em {{month}}.",
@@ -74,6 +81,66 @@
     "topExpenses": {
       "title": "Maiores despesas do mês",
       "empty": "Nenhuma despesa registrada neste mês."
+    }
+  },
+  "statement": {
+    "loading": "Carregando extratos…",
+    "months": {
+      "title": "Extratos por mês",
+      "year": "Ano",
+      "future": "O mês ainda não começou.",
+      "unavailable": "Sem extrato para este período."
+    },
+    "status": {
+      "imported": "Importado",
+      "pending": "Pendente",
+      "unavailable": "Indisponível",
+      "processing": "Processando"
+    },
+    "upload": {
+      "hint": "Arraste um arquivo CSV, OFX ou PDF para esta área.",
+      "choose": "Selecionar arquivo",
+      "invalid": "Selecione apenas um arquivo CSV, OFX ou PDF.",
+      "processing": "Processando o extrato…",
+      "complete": "Extrato de {{month}} importado."
+    },
+    "details": {
+      "title": "Extrato de {{month}}",
+      "chart": "Gastos por categoria",
+      "total": "Total gasto",
+      "noExpenses": "Nenhuma despesa neste período.",
+      "transactions": "Transações do mês"
+    },
+    "categories": {
+      "duplicate": "Já existe uma categoria com esse nome.",
+      "title": "Gerenciar categorias",
+      "select": "Categoria",
+      "new": "Nova categoria",
+      "name": "Nome da categoria",
+      "color": "Cor da categoria",
+      "invalid": "Informe um nome para a categoria.",
+      "save": "Salvar categoria",
+      "create": "Criar categoria",
+      "saved": "Categoria salva."
+    },
+    "assignment": {
+      "label": "Atribuir categoria",
+      "choose": "Selecione uma categoria",
+      "apply": "Atribuir"
+    },
+    "colors": {
+      "violet": "Violeta",
+      "blue": "Azul",
+      "teal": "Verde-azulado",
+      "rose": "Rosa escuro",
+      "amber": "Âmbar",
+      "pink": "Rosa",
+      "olive": "Oliva",
+      "slate": "Cinza-azulado",
+      "cyan": "Ciano",
+      "emerald": "Esmeralda",
+      "fuchsia": "Fúcsia",
+      "brown": "Marrom"
     }
   }
 }

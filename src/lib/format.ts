@@ -1,12 +1,16 @@
 import { i18n, defaultLanguage } from '@/i18n'
 import { parseLocalDate } from './dates'
 
-export function formatCents(amountInCents: number): string {
+export function formatCents(
+  amountInCents: number,
+  signDisplay: Intl.NumberFormatOptions['signDisplay'] = 'auto',
+): string {
   return new Intl.NumberFormat(i18n.resolvedLanguage ?? defaultLanguage, {
     style: 'currency',
     currency: 'BRL',
     currencyDisplay: 'narrowSymbol',
     useGrouping: 'always',
+    signDisplay,
   }).format(amountInCents / 100)
 }
 

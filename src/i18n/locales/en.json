@@ -1,6 +1,8 @@
 {
   "app": {
-    "name": "Financeiro"
+    "name": "Financeiro",
+    "routeError": "The page could not load.",
+    "reload": "Reload page"
   },
   "nav": {
     "label": "Main navigation",
@@ -42,6 +44,10 @@
     "logout": "Sign out"
   },
   "home": {
+    "pending": {
+      "title": "This month’s statement is pending",
+      "description": "Import this month’s statement to see income, expenses, and balance."
+    },
     "greetings": {
       "first": {
         "one": "Glad you're here, {{name}}!",
@@ -66,6 +72,7 @@
       "comparison": "compared with last month"
     },
     "summary": {
+      "previousPending": "Import the statement for {{month}} to compare.",
       "noComparison": "There were no expenses in {{month}} to compare.",
       "less": "You spent {{percent}} less than in {{month}}.",
       "more": "You spent {{percent}} more than in {{month}}.",
@@ -74,6 +81,66 @@
     "topExpenses": {
       "title": "Top expenses this month",
       "empty": "No expenses recorded this month."
+    }
+  },
+  "statement": {
+    "loading": "Loading statements…",
+    "months": {
+      "title": "Monthly statements",
+      "year": "Year",
+      "future": "This month has not started yet.",
+      "unavailable": "No statement for this period."
+    },
+    "status": {
+      "imported": "Imported",
+      "pending": "Pending",
+      "unavailable": "Unavailable",
+      "processing": "Processing"
+    },
+    "upload": {
+      "hint": "Drag a CSV, OFX, or PDF file here.",
+      "choose": "Select file",
+      "invalid": "Select a single CSV, OFX, or PDF file.",
+      "processing": "Processing the statement…",
+      "complete": "Statement for {{month}} imported."
+    },
+    "details": {
+      "title": "Statement for {{month}}",
+      "chart": "Spending by category",
+      "total": "Total spent",
+      "noExpenses": "No expenses for this period.",
+      "transactions": "Monthly transactions"
+    },
+    "categories": {
+      "duplicate": "A category with this name already exists.",
+      "title": "Manage categories",
+      "select": "Category",
+      "new": "New category",
+      "name": "Category name",
+      "color": "Category color",
+      "invalid": "Enter a category name.",
+      "save": "Save category",
+      "create": "Create category",
+      "saved": "Category saved."
+    },
+    "assignment": {
+      "label": "Assign category",
+      "choose": "Select a category",
+      "apply": "Assign"
+    },
+    "colors": {
+      "violet": "Violet",
+      "blue": "Blue",
+      "teal": "Teal",
+      "rose": "Dark rose",
+      "amber": "Amber",
+      "pink": "Pink",
+      "olive": "Olive",
+      "slate": "Slate",
+      "cyan": "Cyan",
+      "emerald": "Emerald",
+      "fuchsia": "Fuchsia",
+      "brown": "Brown"
     }
   }
 }
