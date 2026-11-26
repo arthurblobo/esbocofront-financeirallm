@@ -46,6 +46,7 @@
     "logout": "Cerrar sesión"
   },
   "home": {
+    "importPendingMonths": "Importa los extractos de {{months}} para hacer seguimiento de tus gastos.",
     "importCurrent": "Importa el extracto de {{month}} para hacer seguimiento de este mes.",
     "pending": {
       "title": "Sin extractos importados",
@@ -68,6 +69,8 @@
       }
     },
     "metrics": {
+      "comparisonWithMonth": "respecto a {{month}}",
+      "noComparisonWithMonth": "Sin comparación con {{month}}",
       "noComparison": "Sin comparación con el mes pasado",
       "income": "Ingresos",
       "expenses": "Gastos",
@@ -83,6 +86,7 @@
       "equal": "Gastaste lo mismo que en {{month}}."
     },
     "topExpenses": {
+      "titleForMonth": "Mayores gastos de {{month}}",
       "title": "Mayores gastos del mes",
       "empty": "No hay gastos registrados este mes."
     }

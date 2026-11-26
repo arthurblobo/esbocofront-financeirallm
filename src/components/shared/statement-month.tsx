@@ -41,7 +41,7 @@ export function StatementMonth({ label, status, active, onSelect }: StatementMon
           'flex min-h-18 w-full flex-col items-start justify-center gap-1 rounded-md border border-input px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
           monthStyles[status],
           !disabled && 'hover:border-primary',
-          active && 'ring-2 ring-primary',
+          active && 'border-2 border-primary bg-accent text-accent-foreground',
         )}
         {...tooltip.focusProps}
         onClick={(event) => {
@@ -50,12 +50,12 @@ export function StatementMonth({ label, status, active, onSelect }: StatementMon
         }}
       >
         <span className="wrap-break-word font-semibold capitalize">{label}</span>
-        <span className={cn('wrap-break-word text-xs', status === 'imported' && 'text-positive')}>
+        <span className={cn('wrap-break-word text-xs', !active && status === 'imported' && 'text-positive')}>
           {t(`statement.status.${shownStatus}`)}
         </span>
       </button>
       {disabled && (
-        <div hidden={!tooltip.visible} className="absolute inset-x-0 top-full z-10 pt-1">
+        <div hidden={!tooltip.visible} className="pt-1">
           <span id={tooltipId} role="tooltip" className="block rounded-md border border-input bg-popover px-2 py-1.5 text-xs text-popover-foreground">
             {t(status === 'future' ? 'statement.months.future' : 'statement.months.noData')}
           </span>

@@ -46,6 +46,7 @@
     "logout": "Sair"
   },
   "home": {
+    "importPendingMonths": "Importe os extratos de {{months}} para acompanhar seus gastos.",
     "importCurrent": "Importe o extrato de {{month}} para acompanhar este mês.",
     "pending": {
       "title": "Nenhum extrato importado",
@@ -68,6 +69,8 @@
       }
     },
     "metrics": {
+      "comparisonWithMonth": "em relação a {{month}}",
+      "noComparisonWithMonth": "Sem comparação com {{month}}",
       "noComparison": "Sem comparação com o mês passado",
       "income": "Entradas",
       "expenses": "Saídas",
@@ -83,6 +86,7 @@
       "equal": "Você gastou o mesmo valor que em {{month}}."
     },
     "topExpenses": {
+      "titleForMonth": "Maiores despesas de {{month}}",
       "title": "Maiores despesas do mês",
       "empty": "Nenhuma despesa registrada neste mês."
     }

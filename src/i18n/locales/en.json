@@ -46,6 +46,7 @@
     "logout": "Sign out"
   },
   "home": {
+    "importPendingMonths": "Import the statements for {{months}} to track your spending.",
     "importCurrent": "Import the statement for {{month}} to track this month.",
     "pending": {
       "title": "No imported statements",
@@ -68,6 +69,8 @@
       }
     },
     "metrics": {
+      "comparisonWithMonth": "compared with {{month}}",
+      "noComparisonWithMonth": "No comparison with {{month}}",
       "noComparison": "No comparison with last month",
       "income": "Income",
       "expenses": "Expenses",
@@ -83,6 +86,7 @@
       "equal": "You spent the same amount as in {{month}}."
     },
     "topExpenses": {
+      "titleForMonth": "Top expenses for {{month}}",
       "title": "Top expenses this month",
       "empty": "No expenses recorded this month."
     }

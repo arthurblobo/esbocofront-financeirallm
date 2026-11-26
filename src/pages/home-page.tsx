@@ -8,7 +8,7 @@ import { TransactionRow } from '@/components/shared/transaction-row'
 import { Card } from '@/components/ui/card'
 import { getStatementMonthStatus, useCategories, useStatementMonths, useTransactions } from '@/lib/data'
 import { parseLocalDate } from '@/lib/dates'
-import { formatCents, formatDate, formatPercent } from '@/lib/format'
+import { formatCents, formatDate, formatList, formatPercent } from '@/lib/format'
 import { getGreeting } from '@/lib/greeting'
 import { getMonthSummary, getVariation } from '@/lib/month-summary'
 import { useSession } from '@/lib/session'
@@ -50,6 +50,13 @@ export function HomePage() {
   const balanceTone = current.balance > 0 ? 'positive' : current.balance < 0 ? 'negative' : 'neutral'
   const currentMonth = formatDate(`${calendar.currentMonth}-01`, monthFormat)
   const previousMonth = formatDate(`${calendar.previousMonth}-01`, monthFormat)
+  const summaryMonthName = formatDate(`${referenceMonth}-01`, { month: 'long' })
+  const bothPending = !currentImported && !previousImported
+  const sameYear = calendar.previousMonth.slice(0, 4) === calendar.currentMonth.slice(0, 4)
+  const pendingMonths = formatList([
+    sameYear ? formatDate(`${calendar.previousMonth}-01`, { month: 'long' }) : previousMonth,
+    currentMonth,
+  ])
 
   return (
     <div className="space-y-6">
@@ -68,18 +75,18 @@ export function HomePage() {
           <p className="text-sm text-muted-foreground">{t('home.pending.description')}</p>
         </Card>
       )}
-      {!currentImported && (
+      {(!currentImported || !previousImported) && (
         <Alert
           variant="warning"
-          text={t('home.importCurrent', { month: currentMonth })}
-          action={{ label: t('statement.importMonth', { month: currentMonth }), to: getImportMonthLink(calendar.currentMonth) }}
-        />
-      )}
-      {!previousImported && (
-        <Alert
-          variant="warning"
-          text={t('home.summary.previousPending', { month: previousMonth })}
-          action={{ label: t('statement.importMonth', { month: previousMonth }), to: getImportMonthLink(calendar.previousMonth) }}
+          text={bothPending
+            ? t('home.importPendingMonths', { months: pendingMonths })
+            : !currentImported
+              ? t('home.importCurrent', { month: currentMonth })
+              : t('home.summary.previousPending', { month: previousMonth })}
+          action={{
+            label: t('statement.importMonth', { month: previousImported ? currentMonth : previousMonth }),
+            to: getImportMonthLink(previousImported ? calendar.currentMonth : calendar.previousMonth),
+          }}
         />
       )}
 
@@ -99,6 +106,8 @@ export function HomePage() {
                 value={formatCents(current[field])}
                 valueTone={field === 'balance' ? balanceTone : 'neutral'}
                 variation={getVariation(current[field], previous[field], previous.hasData)}
+                comparisonLabel={currentImported ? undefined : t('home.metrics.comparisonWithMonth', { month: comparisonMonth })}
+                noComparisonLabel={currentImported ? undefined : t('home.metrics.noComparisonWithMonth', { month: comparisonMonth })}
                 variationTone={field === 'expenses' ? 'lowerIsBetter' : 'higherIsBetter'}
               />
             ))}
@@ -107,7 +116,9 @@ export function HomePage() {
           {(!currentImported || previousImported) && <p className="text-sm text-muted-foreground">{summary}</p>}
 
           <Card className="px-4 py-4 sm:px-5">
-            <h2 className="text-base font-semibold">{t('home.topExpenses.title')}</h2>
+            <h2 className="text-base font-semibold">
+              {currentImported ? t('home.topExpenses.title') : t('home.topExpenses.titleForMonth', { month: summaryMonthName })}
+            </h2>
             {topExpenses.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">{t('home.topExpenses.empty')}</p>
             ) : (
