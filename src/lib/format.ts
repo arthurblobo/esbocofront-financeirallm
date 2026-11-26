@@ -20,6 +20,10 @@ export function formatNumber(value: number): string {
   return new Intl.NumberFormat(i18n.resolvedLanguage ?? defaultLanguage).format(value)
 }
 
+export function formatList(items: readonly string[]): string {
+  return new Intl.ListFormat(i18n.resolvedLanguage ?? defaultLanguage).format(items)
+}
+
 export function formatDate(
   date: Date | number | string,
   options?: Intl.DateTimeFormatOptions,

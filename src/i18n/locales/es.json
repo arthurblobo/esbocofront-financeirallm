@@ -5,6 +5,8 @@
     "reload": "Recargar página"
   },
   "nav": {
+    "collapseSidebar": "Contraer barra lateral",
+    "expandSidebar": "Expandir barra lateral",
     "label": "Navegación principal",
     "home": "Inicio",
     "import": "Importar extracto",
@@ -44,9 +46,10 @@
     "logout": "Cerrar sesión"
   },
   "home": {
+    "importCurrent": "Importa el extracto de {{month}} para hacer seguimiento de este mes.",
     "pending": {
-      "title": "El extracto de este mes está pendiente",
-      "description": "Importa el extracto de este mes para consultar los ingresos, los gastos y el saldo."
+      "title": "Sin extractos importados",
+      "description": "Importa un extracto para consultar los ingresos, los gastos y el saldo."
     },
     "greetings": {
       "first": {
@@ -72,7 +75,8 @@
       "comparison": "respecto al mes pasado"
     },
     "summary": {
-      "previousPending": "Importa el extracto de {{month}} para comparar.",
+      "title": "Resumen de {{month}}",
+      "previousPending": "Importa el extracto de {{month}} para comparar tus gastos.",
       "noComparison": "No hay gastos en {{month}} para comparar.",
       "less": "Gastaste un {{percent}} menos que en {{month}}.",
       "more": "Gastaste un {{percent}} más que en {{month}}.",
@@ -147,6 +151,8 @@
       "count": "N.º de transacciones"
     },
     "period": {
+      "comparison_other": "respecto a los {{count}} meses anteriores",
+      "noComparison": "Sin comparación con el período anterior",
       "range": "{{start}} a {{end}}",
       "label": "Período",
       "options": {
@@ -157,6 +163,8 @@
       }
     },
     "trend": {
+      "missingMonths_one": "{{months}} sin extracto importado.",
+      "missingMonths_other": "{{months}} sin extractos importados.",
       "missingCount_one": "{{count}} mes sin extracto importado.",
       "missingCount_other": "{{count}} meses sin extracto importado.",
       "title": "Ingresos y gastos por mes",
@@ -167,8 +175,10 @@
     }
   },
   "statement": {
+    "importMonth": "Importar {{month}}",
     "loading": "Cargando extractos…",
     "months": {
+      "noData": "No hay datos para este período.",
       "title": "Extractos por mes",
       "year": "Año",
       "future": "Este mes aún no ha comenzado.",
@@ -176,7 +186,9 @@
     },
     "status": {
       "imported": "Importado",
-      "pending": "Pendiente",
+      "pending": "Sin extracto importado",
+      "future": "No disponible",
+      "noData": "Sin datos",
       "unavailable": "No disponible",
       "processing": "Procesando"
     },

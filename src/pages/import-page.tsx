@@ -1,6 +1,7 @@
 import { LoaderCircle } from 'lucide-react'
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 
 import { CategoryManager } from '@/components/shared/category-manager'
 import { DonutChart } from '@/components/shared/donut-chart'
@@ -50,11 +51,12 @@ export function ImportPage() {
   const calendar = useStatementMonths()
   const transactions = useTransactions()
   const categories = useCategories()
-  const [requestedMonth, setRequestedMonth] = useState(calendar.currentMonth)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const requestedMonth = searchParams.get('month')
   const [announcement, setAnnouncement] = useState('')
   const detailsHeading = useRef<HTMLHeadingElement>(null)
   const chartHeading = useRef<HTMLHeadingElement>(null)
-  const selectedMonth = calendar.available.has(requestedMonth) ? requestedMonth : calendar.currentMonth
+  const selectedMonth = requestedMonth && calendar.available.has(requestedMonth) ? requestedMonth : calendar.currentMonth
   const selectedYear = Number(selectedMonth.slice(0, 4))
   const currentYear = Number(calendar.currentMonth.slice(0, 4))
   const firstYear = Number(calendar.firstMonth.slice(0, 4))
@@ -78,8 +80,12 @@ export function ImportPage() {
     }
   }, [calendar, selectedMonth, t])
 
+  function selectMonth(month: string) {
+    setSearchParams({ month }, { replace: true })
+  }
+
   function selectYear(year: number) {
-    setRequestedMonth(year === currentYear ? calendar.currentMonth : toLocalDateKey(new Date(year, 11, 1)).slice(0, 7))
+    selectMonth(year === currentYear ? calendar.currentMonth : toLocalDateKey(new Date(year, 11, 1)).slice(0, 7))
   }
 
   function upload() {
@@ -115,7 +121,7 @@ export function ImportPage() {
                 label={label}
                 status={status}
                 active={month === selectedMonth}
-                onSelect={() => setRequestedMonth(month)}
+                onSelect={() => selectMonth(month)}
               />
             )
           })}

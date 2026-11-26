@@ -63,5 +63,11 @@ Início:
 ### Fatia 5 – Assistente (opcional)
 Chat simulado: 4–6 perguntas sugeridas ("Com o que mais gastei este ano?") com respostas pré-calculadas a partir dos mocks, mais um efeito de digitação. Perguntas livres recebem uma resposta padrão dizendo que a IA real virá numa próxima versão.
 
+### Fatia 6 – Ajustes de UX
+- Início mostra a data completa e usa o último mês importado enquanto o atual estiver pendente. O estado vazio aparece apenas sem importações. Alertas permitem abrir o mês atual ou anterior diretamente na tela de extratos.
+- No Dashboard, cards e gráficos seguem o período selecionado. Os cards comparam com a janela anterior de mesma duração, exceto em Tudo. Alertas nomeiam os meses sem extrato e os cards usam grade 2 × 2 no celular.
+- A grade de importação diferencia Importado, Sem extrato importado, Indisponível e Sem dados, com explicações para meses inacessíveis.
+- Cabeçalho fixo no topo, sidebar desktop recolhível com preferência salva e cursores de interação definidos na base. Animações de navegação, cards, tema e gráficos respeitam a preferência por movimento reduzido.
+
 ## Fora do escopo
 Backend, autenticação real, parsing real de extratos, IA real, multiusuário real.

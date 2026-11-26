@@ -1,6 +1,7 @@
 import { Pie, PieChart, ResponsiveContainer } from 'recharts'
 
 import { formatCents, formatPercent } from '@/lib/format'
+import { useReducedMotion } from '@/lib/motion'
 
 export type DonutSegment = {
   id: string
@@ -16,6 +17,7 @@ type DonutChartProps = {
 }
 
 export function DonutChart({ segments, totalLabel, emptyLabel }: DonutChartProps) {
+  const reducedMotion = useReducedMotion()
   const data = segments.map((segment) => ({ ...segment, fill: segment.color }))
   const total = data.reduce((sum, segment) => sum + segment.amountInCents, 0)
 
@@ -36,7 +38,7 @@ export function DonutChart({ segments, totalLabel, emptyLabel }: DonutChartProps
                   outerRadius="98%"
                   stroke="var(--card)"
                   strokeWidth={2}
-                  isAnimationActive={false}
+                  isAnimationActive={!reducedMotion} animationDuration={450}
                   rootTabIndex={-1}
                 />
               </PieChart>

@@ -33,23 +33,30 @@ export function StatementUpload({ onAccept }: { onAccept: () => void }) {
   }
 
   return (
-    <div
-      className={cn('flex flex-col items-center gap-3 rounded-lg border border-dashed border-input px-4 py-8 text-center', dragging && 'border-primary bg-accent')}
-      onDragOver={(event) => {
-        event.preventDefault()
-        setDragging(true)
-      }}
-      onDragLeave={(event) => {
-        if (!(event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget))) setDragging(false)
-      }}
-      onDrop={(event) => {
-        event.preventDefault()
-        setDragging(false)
-        handleFiles(event.dataTransfer.files)
-      }}
-    >
-      <UploadCloud aria-hidden="true" className="size-7 text-primary" />
-      <p className="text-sm text-muted-foreground">{t('statement.upload.hint')}</p>
+    <div className="space-y-2">
+      <Button
+        variant="ghost"
+        aria-label={t('statement.upload.choose')}
+        aria-describedby={invalid ? 'statement-upload-hint statement-upload-error' : 'statement-upload-hint'}
+        className={cn('h-auto w-full flex-col gap-3 rounded-lg border border-dashed border-input px-4 py-8 text-center', dragging && 'border-primary bg-accent')}
+        onClick={() => input.current?.click()}
+        onDragOver={(event) => {
+          event.preventDefault()
+          setDragging(true)
+        }}
+        onDragLeave={(event) => {
+          if (!(event.relatedTarget instanceof Node && event.currentTarget.contains(event.relatedTarget))) setDragging(false)
+        }}
+        onDrop={(event) => {
+          event.preventDefault()
+          setDragging(false)
+          handleFiles(event.dataTransfer.files)
+        }}
+      >
+        <UploadCloud aria-hidden="true" className="text-primary" />
+        <span id="statement-upload-hint" className="text-muted-foreground">{t('statement.upload.hint')}</span>
+        <span className="rounded-md bg-primary px-4 py-2 text-primary-foreground">{t('statement.upload.choose')}</span>
+      </Button>
       <Input
         ref={input}
         type="file"
@@ -61,14 +68,6 @@ export function StatementUpload({ onAccept }: { onAccept: () => void }) {
           event.currentTarget.value = ''
         }}
       />
-      <Button
-        variant="primary"
-        aria-label={t('statement.upload.choose')}
-        aria-describedby={invalid ? 'statement-upload-error' : undefined}
-        onClick={() => input.current?.click()}
-      >
-        {t('statement.upload.choose')}
-      </Button>
       {invalid && <p id="statement-upload-error" role="alert" className="text-sm text-negative">{t('statement.upload.invalid')}</p>}
     </div>
   )

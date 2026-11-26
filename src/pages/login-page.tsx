@@ -69,7 +69,7 @@ export function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center px-4 py-8">
+    <main data-page-content className="grid min-h-dvh place-items-center px-4 py-8">
       <Card className="w-full max-w-md px-5 py-7 sm:px-8 sm:py-8">
         <header className="mb-7 space-y-4">
           <div className="flex items-center gap-3 text-sm font-semibold">
@@ -106,7 +106,7 @@ export function LoginPage() {
           <Button
             type="submit"
             variant="primary"
-            className="mt-2 w-full aria-disabled:pointer-events-none aria-disabled:opacity-50"
+            className="mt-2 w-full aria-disabled:opacity-50"
             aria-disabled={loading}
             aria-label={t(loading ? 'login.loading' : 'login.submit')}
           >

@@ -26,11 +26,12 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
   const month = today.getMonth()
   const currentStart = new Date(year, month, 1)
   const currentMonth = toLocalDateKey(currentStart).slice(0, 7)
-  const fixedMonths = period === 'all' ? null : Number(period)
-  const start = fixedMonths === null ? null : new Date(year, month - fixedMonths + 1, 1)
-  const startMonth = start === null ? null : toLocalDateKey(start).slice(0, 7)
+  const size = period === 'all' ? null : Number(period)
+  const startMonth = size === null ? null : toLocalDateKey(new Date(year, month - size + 1, 1)).slice(0, 7)
+  const previousStart = size === null ? null : toLocalDateKey(new Date(year, month - 2 * size + 1, 1)).slice(0, 7)
   const byMonth = new Map<string, Totals>()
-  const totals = { income: 0, expenses: 0, count: 0 }
+  const currentPeriod = { income: 0, expenses: 0, count: 0 }
+  const previousPeriod = { income: 0, expenses: 0, count: 0 }
   const periodTransactions: Transaction[] = []
   let firstMonth = currentMonth
 
@@ -41,9 +42,13 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
     const monthly = byMonth.get(key) ?? { income: 0, expenses: 0, count: 0 }
     includeTransaction(monthly, transaction)
     byMonth.set(key, monthly)
-    includeTransaction(totals, transaction)
     if (key < firstMonth) firstMonth = key
-    if (startMonth === null || key >= startMonth) periodTransactions.push(transaction)
+    if (startMonth === null || key >= startMonth) {
+      includeTransaction(currentPeriod, transaction)
+      periodTransactions.push(transaction)
+    } else if (previousStart !== null && key >= previousStart) {
+      includeTransaction(previousPeriod, transaction)
+    }
   }
 
   const months = []
@@ -52,31 +57,24 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
   while (cursor <= currentStart) {
     const key = toLocalDateKey(cursor).slice(0, 7)
     const monthly = byMonth.get(key)
-    months.push({
-      key,
-      income: monthly?.income ?? null,
-      expenses: monthly?.expenses ?? null,
-    })
+    months.push({ key, income: monthly?.income ?? null, expenses: monthly?.expenses ?? null })
     cursor.setMonth(cursor.getMonth() + 1)
   }
 
-  const historicalTotals = withBalance(totals)
-  const currentMonthTotals = byMonth.get(currentMonth)
-  const current = currentMonthTotals && withBalance(currentMonthTotals)
-  function accumulatedVariation(field: keyof typeof historicalTotals) {
-    if (!current || firstMonth === currentMonth) return null
-
-    const total = historicalTotals[field]
-    return getVariation(total, total - current[field], true)
+  const totals = withBalance(currentPeriod)
+  const previous = withBalance(previousPeriod)
+  const canCompare = totals.count > 0 && previous.count > 0
+  function periodVariation(field: keyof typeof totals) {
+    return getVariation(totals[field], previous[field], canCompare)
   }
 
   return {
-    totals: historicalTotals,
-    variations: {
-      income: accumulatedVariation('income'),
-      expenses: accumulatedVariation('expenses'),
-      balance: accumulatedVariation('balance'),
-      count: accumulatedVariation('count'),
+    totals,
+    variations: size === null ? undefined : {
+      income: periodVariation('income'),
+      expenses: periodVariation('expenses'),
+      balance: periodVariation('balance'),
+      count: periodVariation('count'),
     },
     months,
     periodTransactions,

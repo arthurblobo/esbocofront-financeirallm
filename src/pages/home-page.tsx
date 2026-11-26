@@ -1,17 +1,18 @@
 import { ArrowDownLeft, ArrowUpRight, Wallet } from 'lucide-react'
 import { useLayoutEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
+import { Alert } from '@/components/shared/alert'
 import { MetricCard } from '@/components/shared/metric-card'
 import { TransactionRow } from '@/components/shared/transaction-row'
 import { Card } from '@/components/ui/card'
 import { getStatementMonthStatus, useCategories, useStatementMonths, useTransactions } from '@/lib/data'
+import { parseLocalDate } from '@/lib/dates'
 import { formatCents, formatDate, formatPercent } from '@/lib/format'
 import { getGreeting } from '@/lib/greeting'
 import { getMonthSummary, getVariation } from '@/lib/month-summary'
 import { useSession } from '@/lib/session'
-import { pages } from '@/routes'
+import { getImportMonthLink } from '@/routes'
 
 const metrics = [
   { field: 'income', icon: ArrowDownLeft },
@@ -19,13 +20,13 @@ const metrics = [
   { field: 'balance', icon: Wallet },
 ] as const
 
+const monthFormat = { month: 'long', year: 'numeric' } as const
+
 export function HomePage() {
   const { t } = useTranslation()
-  const session = useSession()
-  const user = session?.user
+  const user = useSession()?.user
   const transactions = useTransactions()
   const calendar = useStatementMonths()
-  const waitingForStatement = getStatementMonthStatus(calendar, calendar.currentMonth) !== 'imported'
   const categories = useCategories()
   const [greeting, setGreeting] = useState<ReturnType<typeof getGreeting> | null>(null)
 
@@ -33,19 +34,22 @@ export function HomePage() {
     if (user) setGreeting(getGreeting(user))
   }, [user])
 
-  const { current, previous, currentStart, previousStart, topExpenses } = getMonthSummary(transactions, new Date())
-  const expenseVariation = getVariation(current.expenses, previous.expenses, previous.hasData)
-  const previousMonth = formatDate(previousStart, { month: 'long' })
+  const currentImported = getStatementMonthStatus(calendar, calendar.currentMonth) === 'imported'
   const previousImported = getStatementMonthStatus(calendar, calendar.previousMonth) === 'imported'
-  const summary = !previousImported
-    ? t('home.summary.previousPending', { month: previousMonth })
-    : expenseVariation === null
-    ? t('home.summary.noComparison', { month: previousMonth })
+  const summaryMonth = [...calendar.available].reverse().find((month) => getStatementMonthStatus(calendar, month) === 'imported')
+  const referenceMonth = summaryMonth ?? calendar.currentMonth
+  const { current, previous, previousStart, topExpenses } = getMonthSummary(transactions, parseLocalDate(`${referenceMonth}-01`))
+  const expenseVariation = getVariation(current.expenses, previous.expenses, previous.hasData)
+  const comparisonMonth = formatDate(previousStart, { month: 'long' })
+  const summary = expenseVariation === null
+    ? t('home.summary.noComparison', { month: comparisonMonth })
     : t(expenseVariation === 0 ? 'home.summary.equal' : expenseVariation > 0 ? 'home.summary.more' : 'home.summary.less', {
-        month: previousMonth,
+        month: comparisonMonth,
         percent: formatPercent(Math.abs(expenseVariation)),
       })
   const balanceTone = current.balance > 0 ? 'positive' : current.balance < 0 ? 'negative' : 'neutral'
+  const currentMonth = formatDate(`${calendar.currentMonth}-01`, monthFormat)
+  const previousMonth = formatDate(`${calendar.previousMonth}-01`, monthFormat)
 
   return (
     <div className="space-y-6">
@@ -54,20 +58,38 @@ export function HomePage() {
           {greeting && user ? t(greeting, { name: user.name }) : t('nav.home')}
         </h1>
         <p className="text-sm text-muted-foreground first-letter:uppercase">
-          {formatDate(currentStart, { month: 'long', year: 'numeric' })}
+          {formatDate(new Date(), { day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
       </header>
 
-      {waitingForStatement ? (
-        <Card className="space-y-3 px-4 py-5 sm:px-5">
+      {!summaryMonth && (
+        <Card className="space-y-2 px-4 py-5 sm:px-5">
           <h2 className="text-base font-semibold">{t('home.pending.title')}</h2>
           <p className="text-sm text-muted-foreground">{t('home.pending.description')}</p>
-          <Link className="inline-flex min-h-11 items-center rounded-md border border-input px-4 text-sm font-medium text-primary hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring" to={pages.import.to}>
-            {t('nav.import')}
-          </Link>
         </Card>
-      ) : (
-        <>
+      )}
+      {!currentImported && (
+        <Alert
+          variant="warning"
+          text={t('home.importCurrent', { month: currentMonth })}
+          action={{ label: t('statement.importMonth', { month: currentMonth }), to: getImportMonthLink(calendar.currentMonth) }}
+        />
+      )}
+      {!previousImported && (
+        <Alert
+          variant="warning"
+          text={t('home.summary.previousPending', { month: previousMonth })}
+          action={{ label: t('statement.importMonth', { month: previousMonth }), to: getImportMonthLink(calendar.previousMonth) }}
+        />
+      )}
+
+      {summaryMonth && (
+        <section className="space-y-4" aria-labelledby={!currentImported ? "home-summary-title" : undefined}>
+          {!currentImported && (
+            <h2 id="home-summary-title" className="text-lg font-semibold">
+              {t('home.summary.title', { month: formatDate(`${summaryMonth}-01`, monthFormat) })}
+            </h2>
+          )}
           <div className="grid gap-3 sm:grid-cols-3">
             {metrics.map(({ field, icon }) => (
               <MetricCard
@@ -82,7 +104,7 @@ export function HomePage() {
             ))}
           </div>
 
-          <p className="text-sm text-muted-foreground">{summary}</p>
+          {(!currentImported || previousImported) && <p className="text-sm text-muted-foreground">{summary}</p>}
 
           <Card className="px-4 py-4 sm:px-5">
             <h2 className="text-base font-semibold">{t('home.topExpenses.title')}</h2>
@@ -100,7 +122,7 @@ export function HomePage() {
               </ul>
             )}
           </Card>
-        </>
+        </section>
       )}
     </div>
   )
