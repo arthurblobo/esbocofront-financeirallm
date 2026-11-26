@@ -64,10 +64,23 @@ Início:
 Chat simulado: 4–6 perguntas sugeridas ("Com o que mais gastei este ano?") com respostas pré-calculadas a partir dos mocks, mais um efeito de digitação. Perguntas livres recebem uma resposta padrão dizendo que a IA real virá numa próxima versão.
 
 ### Fatia 6 – Ajustes de UX
-- Início mostra a data completa e usa o último mês importado enquanto o atual estiver pendente. O estado vazio aparece apenas sem importações. Alertas permitem abrir o mês atual ou anterior diretamente na tela de extratos.
-- No Dashboard, cards e gráficos seguem o período selecionado. Os cards comparam com a janela anterior de mesma duração, exceto em Tudo. Alertas nomeiam os meses sem extrato e os cards usam grade 2 × 2 no celular.
-- A grade de importação diferencia Importado, Sem extrato importado, Indisponível e Sem dados, com explicações para meses inacessíveis.
-- Cabeçalho fixo no topo, sidebar desktop recolhível com preferência salva e cursores de interação definidos na base. Animações de navegação, cards, tema e gráficos respeitam a preferência por movimento reduzido.
+- Início mostra o último mês importado enquanto o mês atual estiver pendente, com título “Resumo de {mês}”. O estado vazio aparece apenas sem importações.
+- A data abaixo da saudação mostra dia, mês e ano no formato local.
+- O componente Alert é reutilizável, tem variantes warning e info, ícone, texto e ação por link. Os tokens de aviso têm contraste AA nos dois temas.
+- Alertas no Início permitem abrir o mês atual ou anterior já selecionado em Importar extrato.
+- No Dashboard, cards e gráficos seguem o período selecionado. A variação compara com a janela anterior de mesma duração quando todos os meses das duas janelas têm extrato importado. Em Tudo, a variação fica oculta.
+- O alerta do Dashboard nomeia os meses sem extrato e o link abre o mais recente deles.
+- Os cards do Dashboard usam grade 2 × 2 no celular.
+- A grade de importação diferencia Importado, Sem extrato importado, Indisponível e Sem dados. Cada estado tem estilo próprio, e meses futuros ou sem dados têm tooltip.
+- O cabeçalho permanece fixo no topo, inclusive com o menu móvel aberto.
+- Os cursores são definidos na base. Elementos clicáveis usam `cursor-pointer` e desabilitados usam `cursor-not-allowed`.
+- No desktop, a sidebar recolhe para ícones com tooltip e `aria-label`. A preferência é persistida, a largura tem transição suave e o conteúdo acompanha a largura.
+- Ao mudar de página, o conteúdo entra com fade e deslocamento de 8 px em cerca de 250 ms. Os cards entram em cascata.
+- A troca de tema anima o ícone e as cores de fundo, texto e bordas. Hover e foco em botões, itens da sidebar e meses têm transição de cor.
+- Os gráficos usam a animação de entrada do Recharts.
+- As animações respeitam `prefers-reduced-motion` e evitam flash, salto de layout e atraso de foco.
+- Os textos novos têm tradução em pt-BR, en e es.
+- A fatia usa CSS e Tailwind com as dependências existentes.
 
 ## Fora do escopo
 Backend, autenticação real, parsing real de extratos, IA real, multiusuário real.
