@@ -1,7 +1,8 @@
-import { useEffect, useId, useState } from 'react'
+import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { getStatementMonthStatus } from '@/lib/data'
+import { useDismissibleTooltip } from '@/lib/use-dismissible-tooltip'
 import { cn } from '@/lib/utils'
 
 const monthStyles = {
@@ -22,32 +23,14 @@ type StatementMonthProps = {
 export function StatementMonth({ label, status, active, onSelect }: StatementMonthProps) {
   const { t } = useTranslation()
   const tooltipId = useId()
-  const [hovered, setHovered] = useState(false)
-  const [focused, setFocused] = useState(false)
-  const [dismissed, setDismissed] = useState(false)
   const disabled = status === 'unavailable' || status === 'future'
   const shownStatus = status === 'unavailable' ? 'noData' : status
-  const tooltipVisible = disabled && (hovered || focused) && !dismissed
-
-  useEffect(() => {
-    if (!tooltipVisible) return
-
-    function dismiss(event: KeyboardEvent) {
-      if (event.key === 'Escape') setDismissed(true)
-    }
-
-    document.addEventListener('keydown', dismiss)
-    return () => document.removeEventListener('keydown', dismiss)
-  }, [tooltipVisible])
+  const tooltip = useDismissibleTooltip(disabled)
 
   return (
     <li
       className="relative min-w-0"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => {
-        setHovered(false)
-        if (!focused) setDismissed(false)
-      }}
+      {...tooltip.hoverProps}
     >
       <button
         type="button"
@@ -60,11 +43,7 @@ export function StatementMonth({ label, status, active, onSelect }: StatementMon
           !disabled && 'hover:border-primary',
           active && 'ring-2 ring-primary',
         )}
-        onFocus={() => setFocused(true)}
-        onBlur={() => {
-          setFocused(false)
-          if (!hovered) setDismissed(false)
-        }}
+        {...tooltip.focusProps}
         onClick={(event) => {
           if (disabled) event.currentTarget.focus()
           else onSelect()
@@ -76,7 +55,7 @@ export function StatementMonth({ label, status, active, onSelect }: StatementMon
         </span>
       </button>
       {disabled && (
-        <div hidden={!tooltipVisible} className="absolute inset-x-0 top-full z-10 pt-1">
+        <div hidden={!tooltip.visible} className="absolute inset-x-0 top-full z-10 pt-1">
           <span id={tooltipId} role="tooltip" className="block rounded-md border border-input bg-popover px-2 py-1.5 text-xs text-popover-foreground">
             {t(status === 'future' ? 'statement.months.future' : 'statement.months.noData')}
           </span>

@@ -90,7 +90,7 @@ export function HomePage() {
               {t('home.summary.title', { month: formatDate(`${summaryMonth}-01`, monthFormat) })}
             </h2>
           )}
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 lg:grid-cols-3">
             {metrics.map(({ field, icon }) => (
               <MetricCard
                 key={field}

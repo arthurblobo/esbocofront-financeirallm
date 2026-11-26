@@ -151,6 +151,7 @@
       "count": "N.º de transacciones"
     },
     "period": {
+      "incomplete": "Sin comparación: hay meses sin extracto importado",
       "comparison_other": "respecto a los {{count}} meses anteriores",
       "noComparison": "Sin comparación con el período anterior",
       "range": "{{start}} a {{end}}",

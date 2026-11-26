@@ -30,12 +30,12 @@ export function MetricCard({
   const comparisonTone = effect > 0 ? 'positive' : effect < 0 ? 'negative' : 'neutral'
 
   return (
-    <Card className="min-w-0 space-y-2 px-3 py-4 sm:px-5">
+    <Card className="@container min-w-0 space-y-2 px-3 py-4 sm:px-5">
       <div className="flex items-center justify-between gap-2">
         <h2 className="min-w-0 text-sm font-medium">{title}</h2>
         <Icon aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
       </div>
-      <p className={cn('wrap-anywhere text-lg sm:text-2xl font-semibold tracking-tight tabular-nums', toneClasses[valueTone])}>
+      <p className={cn('whitespace-nowrap text-lg @[13rem]:text-2xl font-semibold tracking-tight tabular-nums', toneClasses[valueTone])}>
         {value}
       </p>
       {variation !== undefined && (

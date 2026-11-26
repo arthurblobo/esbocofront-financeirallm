@@ -25,10 +25,11 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
   const year = today.getFullYear()
   const month = today.getMonth()
   const currentStart = new Date(year, month, 1)
-  const currentMonth = toLocalDateKey(currentStart).slice(0, 7)
+  const monthKey = (offset: number) => toLocalDateKey(new Date(year, month - offset, 1)).slice(0, 7)
+  const currentMonth = monthKey(0)
   const size = period === 'all' ? null : Number(period)
-  const startMonth = size === null ? null : toLocalDateKey(new Date(year, month - size + 1, 1)).slice(0, 7)
-  const previousStart = size === null ? null : toLocalDateKey(new Date(year, month - 2 * size + 1, 1)).slice(0, 7)
+  const startMonth = size === null ? null : monthKey(size - 1)
+  const previousStart = size === null ? null : monthKey(2 * size - 1)
   const byMonth = new Map<string, Totals>()
   const currentPeriod = { income: 0, expenses: 0, count: 0 }
   const previousPeriod = { income: 0, expenses: 0, count: 0 }
@@ -63,13 +64,15 @@ export function getDashboardData(transactions: readonly Transaction[], period: D
 
   const totals = withBalance(currentPeriod)
   const previous = withBalance(previousPeriod)
-  const canCompare = totals.count > 0 && previous.count > 0
+  const incompleteComparison = size !== null && Array.from({ length: 2 * size }, (_, offset) => monthKey(offset))
+    .some((key) => !byMonth.has(key))
   function periodVariation(field: keyof typeof totals) {
-    return getVariation(totals[field], previous[field], canCompare)
+    return getVariation(totals[field], previous[field], !incompleteComparison)
   }
 
   return {
     totals,
+    incompleteComparison,
     variations: size === null ? undefined : {
       income: periodVariation('income'),
       expenses: periodVariation('expenses'),

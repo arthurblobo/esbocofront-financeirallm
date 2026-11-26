@@ -32,7 +32,7 @@ export function DashboardPage() {
   const transactions = useTransactions()
   const categories = useCategories()
   const [period, setPeriod] = useState(() => readPeriod(readStorage(periodKey)))
-  const { totals, variations, months, periodTransactions } = getDashboardData(transactions, period, new Date())
+  const { totals, variations, incompleteComparison, months, periodTransactions } = getDashboardData(transactions, period, new Date())
   const segments = getCategoryTotals(periodTransactions, categories, t)
   const balanceTone = totals.balance > 0 ? 'positive' : totals.balance < 0 ? 'negative' : 'neutral'
   const points = months.map(({ key, income, expenses }) => ({
@@ -60,7 +60,7 @@ export function DashboardPage() {
             valueTone={field === 'balance' ? balanceTone : 'neutral'}
             variation={variations?.[field]}
             comparisonLabel={comparisonLabel}
-            noComparisonLabel={t('dashboard.period.noComparison')}
+            noComparisonLabel={t(incompleteComparison ? 'dashboard.period.incomplete' : 'dashboard.period.noComparison')}
             variationTone={variationTone}
           />
         ))}

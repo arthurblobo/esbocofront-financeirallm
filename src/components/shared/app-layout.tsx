@@ -9,6 +9,7 @@ import { useProfile } from '@/lib/profile'
 import { useSession } from '@/lib/session'
 import { readStorage, writeStorage } from '@/lib/storage'
 import { saveTheme, useTheme } from '@/lib/theme'
+import { useDismissibleTooltip } from '@/lib/use-dismissible-tooltip'
 import { cn } from '@/lib/utils'
 import { pages } from '@/routes'
 
@@ -20,36 +21,50 @@ type NavigationProps = {
 
 const sidebarKey = 'sidebarCollapsed'
 
+function NavigationItem({
+  page, compact, onNavigate,
+}: { page: (typeof pages)[keyof typeof pages]; compact: boolean; onNavigate?: NavigationProps['onNavigate'] }) {
+  const { t } = useTranslation()
+  const { to, title, icon: Icon } = page
+  const tooltip = useDismissibleTooltip(compact)
+
+  return (
+    <NavLink
+      to={to}
+      end
+      onClick={onNavigate}
+      aria-label={t(title)}
+      className={cn(
+        'relative flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground last:mt-auto',
+        compact && 'justify-center px-0',
+      )}
+      {...(compact ? { ...tooltip.hoverProps, ...tooltip.focusProps } : {})}
+    >
+      <Icon aria-hidden="true" className="size-4 shrink-0" />
+      {compact ? (
+        <span aria-hidden="true" hidden={!tooltip.visible} className="absolute left-full z-10 pl-2">
+          <span className="block whitespace-nowrap rounded-md border border-input bg-popover px-2 py-1.5 text-xs text-popover-foreground">
+            {t(title)}
+          </span>
+        </span>
+      ) : <span className="truncate">{t(title)}</span>}
+    </NavLink>
+  )
+}
+
 function Navigation({ compact = false, id, onNavigate }: NavigationProps) {
   const { t } = useTranslation()
 
   return (
     <nav id={id} aria-label={t('nav.label')} className="flex flex-1 flex-col gap-1 p-3">
-      {Object.values(pages).map(({ to, title, icon: Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end
-          onClick={onNavigate}
-          aria-label={t(title)}
-          className={cn(
-            'group relative flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-medium text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground last:mt-auto',
-            compact && 'justify-center px-0',
-          )}
-        >
-          <Icon aria-hidden="true" className="size-4 shrink-0" />
-          {compact ? (
-            <span aria-hidden="true" className="pointer-events-none absolute left-full z-10 ml-2 hidden whitespace-nowrap rounded-md border border-input bg-popover px-2 py-1.5 text-xs text-popover-foreground group-hover:block group-focus-visible:block">
-              {t(title)}
-            </span>
-          ) : <span className="truncate">{t(title)}</span>}
-        </NavLink>
+      {Object.values(pages).map((page) => (
+        <NavigationItem key={page.to} page={page} compact={compact} onNavigate={onNavigate} />
       ))}
     </nav>
   )
 }
 
-function Brand() {
+function Brand({ compact = false }: { compact?: boolean }) {
   const { t } = useTranslation()
 
   return (
@@ -57,7 +72,7 @@ function Brand() {
       <span className="grid size-9 shrink-0 place-items-center rounded-md bg-primary text-primary-foreground">
         <Wallet aria-hidden="true" className="size-5" />
       </span>
-      {t('app.name')}
+      <span className={compact ? 'sr-only' : undefined}>{t('app.name')}</span>
     </div>
   )
 }
@@ -115,8 +130,8 @@ export function AppLayout() {
   return (
     <div data-sidebar={sidebarCollapsed ? 'compact' : 'full'} className="app-shell">
       <aside className="desktop-sidebar fixed inset-y-0 left-0 z-40 hidden w-[var(--sidebar-width)] flex-col border-r border-border bg-card md:flex">
-        <div className={cn('flex min-h-16 items-center gap-2 border-b border-border px-3', sidebarCollapsed ? 'justify-center' : 'justify-between')}>
-          {!sidebarCollapsed && <Brand />}
+        <div className={cn('flex min-h-16 items-center gap-2 border-b border-border px-3', sidebarCollapsed ? 'flex-col justify-center py-3' : 'justify-between')}>
+          <Brand compact={sidebarCollapsed} />
           <Button
             size="icon"
             variant="ghost"

@@ -151,6 +151,7 @@
       "count": "Transaction count"
     },
     "period": {
+      "incomplete": "No comparison: some months have no imported statement",
       "comparison_other": "compared with the previous {{count}} months",
       "noComparison": "No comparison with the previous period",
       "range": "{{start}} to {{end}}",
