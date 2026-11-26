@@ -22,6 +22,8 @@
   --color-input: var(--input);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
 }
 
 :root {
@@ -31,6 +33,8 @@
   --card: #121215;
   --muted-foreground: #b0aeb9;
   --primary: #b9a2ff;
+  --warning: #382509;
+  --warning-foreground: #f9d787;
   --primary-foreground: #151020;
   --accent: #251c38;
   --accent-foreground: #d9caff;
@@ -54,6 +58,8 @@
   --card: #ffffff;
   --muted-foreground: #575260;
   --primary: #5c32b1;
+  --warning: #fff3ce;
+  --warning-foreground: #694000;
   --primary-foreground: #ffffff;
   --accent: #eee8ff;
   --accent-foreground: #492490;
@@ -71,7 +77,76 @@
 }
 
 @layer base {
+  html {
+    scroll-padding-top: 4.5rem;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
   }
+
+  :where(button, a[href], select, summary, label:has(input:is([type="radio"], [type="checkbox"]))) {
+    cursor: pointer;
+  }
+
+  :where(:disabled, [aria-disabled="true"], label:has(input:disabled)) {
+    cursor: not-allowed;
+  }
+}
+
+.app-shell {
+  --sidebar-width: 15rem;
+}
+
+.app-shell[data-sidebar="compact"] {
+  --sidebar-width: 4.25rem;
+}
+
+.theme-icon-sun,
+[data-theme="light"] .theme-icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-icon-moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.75);
+}
+
+[data-theme="light"] .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.75);
+}
+
+/* Keep colors, navigation and card changes still when reduced motion is requested. */
+@media (prefers-reduced-motion: no-preference) {
+  :where(body, body *) {
+    transition: background-color 200ms ease-out, color 200ms ease-out, border-color 200ms ease-out;
+  }
+
+  .desktop-sidebar {
+    transition: width 200ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out;
+  }
+
+  .app-body {
+    transition: padding-left 200ms ease-out;
+  }
+
+  .theme-icon {
+    transition: opacity 200ms ease-out, transform 200ms ease-out;
+  }
+
+  [data-page-content],
+  [data-page-content] [data-slot="card"] {
+    animation: page-enter 250ms ease-out both;
+  }
+
+  [data-page-content] [data-slot="card"]:nth-child(2) { animation-delay: 30ms; }
+  [data-page-content] [data-slot="card"]:nth-child(3) { animation-delay: 60ms; }
+  [data-page-content] [data-slot="card"]:nth-child(4) { animation-delay: 90ms; }
+}
+
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }

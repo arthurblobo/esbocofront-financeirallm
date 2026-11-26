@@ -1,8 +1,17 @@
-import { useEffect, useId, useState } from 'react'
+import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import type { getStatementMonthStatus } from '@/lib/data'
+import { useDismissibleTooltip } from '@/lib/use-dismissible-tooltip'
 import { cn } from '@/lib/utils'
+
+const monthStyles = {
+  imported: 'border-positive/40',
+  pending: 'border-warning-foreground/45 bg-warning text-warning-foreground',
+  processing: 'border-primary/50 bg-accent text-accent-foreground',
+  unavailable: 'border-border border-dashed bg-muted text-muted-foreground',
+  future: 'border-border bg-muted text-muted-foreground',
+} as const
 
 type StatementMonthProps = {
   label: string
@@ -14,32 +23,14 @@ type StatementMonthProps = {
 export function StatementMonth({ label, status, active, onSelect }: StatementMonthProps) {
   const { t } = useTranslation()
   const tooltipId = useId()
-  const [hovered, setHovered] = useState(false)
-  const [focused, setFocused] = useState(false)
-  const [dismissed, setDismissed] = useState(false)
   const disabled = status === 'unavailable' || status === 'future'
-  const shownStatus = status === 'future' ? 'unavailable' : status
-  const tooltipVisible = disabled && (hovered || focused) && !dismissed
-
-  useEffect(() => {
-    if (!tooltipVisible) return
-
-    function dismiss(event: KeyboardEvent) {
-      if (event.key === 'Escape') setDismissed(true)
-    }
-
-    document.addEventListener('keydown', dismiss)
-    return () => document.removeEventListener('keydown', dismiss)
-  }, [tooltipVisible])
+  const shownStatus = status === 'unavailable' ? 'noData' : status
+  const tooltip = useDismissibleTooltip(disabled)
 
   return (
     <li
       className="relative min-w-0"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => {
-        setHovered(false)
-        if (!focused) setDismissed(false)
-      }}
+      {...tooltip.hoverProps}
     >
       <button
         type="button"
@@ -48,28 +39,25 @@ export function StatementMonth({ label, status, active, onSelect }: StatementMon
         aria-describedby={disabled ? tooltipId : undefined}
         className={cn(
           'flex min-h-18 w-full flex-col items-start justify-center gap-1 rounded-md border border-input px-3 py-2 text-left text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
-          disabled ? 'cursor-not-allowed text-muted-foreground' : 'hover:bg-muted',
-          active && 'border-primary bg-accent text-accent-foreground',
+          monthStyles[status],
+          !disabled && 'hover:border-primary',
+          active && 'ring-2 ring-primary',
         )}
-        onFocus={() => setFocused(true)}
-        onBlur={() => {
-          setFocused(false)
-          if (!hovered) setDismissed(false)
-        }}
+        {...tooltip.focusProps}
         onClick={(event) => {
           if (disabled) event.currentTarget.focus()
           else onSelect()
         }}
       >
         <span className="wrap-break-word font-semibold capitalize">{label}</span>
-        <span className={cn('wrap-break-word text-xs', active ? 'text-accent-foreground' : status === 'imported' ? 'text-positive' : 'text-muted-foreground')}>
+        <span className={cn('wrap-break-word text-xs', status === 'imported' && 'text-positive')}>
           {t(`statement.status.${shownStatus}`)}
         </span>
       </button>
       {disabled && (
-        <div hidden={!tooltipVisible} className="absolute inset-x-0 top-full z-10 pt-1">
+        <div hidden={!tooltip.visible} className="absolute inset-x-0 top-full z-10 pt-1">
           <span id={tooltipId} role="tooltip" className="block rounded-md border border-input bg-popover px-2 py-1.5 text-xs text-popover-foreground">
-            {t(status === 'future' ? 'statement.months.future' : 'statement.months.unavailable')}
+            {t(status === 'future' ? 'statement.months.future' : 'statement.months.noData')}
           </span>
         </div>
       )}

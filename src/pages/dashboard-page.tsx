@@ -1,8 +1,8 @@
 import { ArrowDownLeft, ArrowUpRight, Receipt, Wallet } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
 
+import { Alert } from '@/components/shared/alert'
 import { DonutChart } from '@/components/shared/donut-chart'
 import { LineChart } from '@/components/shared/line-chart'
 import { MetricCard } from '@/components/shared/metric-card'
@@ -11,9 +11,9 @@ import { Select } from '@/components/ui/select'
 import { dashboardPeriods, getDashboardData, type DashboardPeriod } from '@/lib/dashboard'
 import { useCategories, useTransactions } from '@/lib/data'
 import { getCategoryTotals } from '@/lib/category-totals'
-import { formatCents, formatDate, formatNumber } from '@/lib/format'
+import { formatCents, formatDate, formatList, formatNumber } from '@/lib/format'
 import { readStorage, writeStorage } from '@/lib/storage'
-import { pages } from '@/routes'
+import { getImportMonthLink } from '@/routes'
 
 const periodKey = 'dashboardPeriod'
 const metrics = [
@@ -32,7 +32,7 @@ export function DashboardPage() {
   const transactions = useTransactions()
   const categories = useCategories()
   const [period, setPeriod] = useState(() => readPeriod(readStorage(periodKey)))
-  const { totals, variations, months, periodTransactions } = getDashboardData(transactions, period, new Date())
+  const { totals, variations, incompleteComparison, months, periodTransactions } = getDashboardData(transactions, period, new Date())
   const segments = getCategoryTotals(periodTransactions, categories, t)
   const balanceTone = totals.balance > 0 ? 'positive' : totals.balance < 0 ? 'negative' : 'neutral'
   const points = months.map(({ key, income, expenses }) => ({
@@ -42,12 +42,15 @@ export function DashboardPage() {
     values: { income, expenses },
   }))
   const periodRange = t('dashboard.period.range', { start: points[0].tickLabel, end: points[points.length - 1].tickLabel })
-  const missingMonths = months.filter(({ income, expenses }) => income === null && expenses === null).length
+  const missingMonths = points.filter(({ values }) => values.income === null && values.expenses === null)
+  const latestMissing = missingMonths.at(-1)
+  const missingLabels = formatList(missingMonths.map(({ label }) => label))
+  const comparisonLabel = period === 'all' ? undefined : t('dashboard.period.comparison', { count: Number(period) })
 
   return (
     <div className="space-y-5">
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t('nav.dashboard')}</h1>
-      <div className="grid gap-3 min-[440px]:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
         {metrics.map(({ field, icon, variationTone }) => (
           <MetricCard
             key={field}
@@ -55,7 +58,9 @@ export function DashboardPage() {
             icon={icon}
             value={field === 'count' ? formatNumber(totals[field]) : formatCents(totals[field])}
             valueTone={field === 'balance' ? balanceTone : 'neutral'}
-            variation={variations[field]}
+            variation={variations?.[field]}
+            comparisonLabel={comparisonLabel}
+            noComparisonLabel={t(incompleteComparison ? 'dashboard.period.incomplete' : 'dashboard.period.noComparison')}
             variationTone={variationTone}
           />
         ))}
@@ -94,13 +99,15 @@ export function DashboardPage() {
             ]}
             formatValue={formatCents}
             formatTick={(value) => formatCents(value, 'auto', 'compact')}
-            note={missingMonths > 0 && (
-              <p className="text-sm text-muted-foreground">
-                {t('dashboard.trend.missingCount', { count: missingMonths })}{' '}
-                <Link to={pages.import.to} className="rounded-sm font-medium text-primary underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-ring">
-                  {t('nav.import')}
-                </Link>
-              </p>
+            note={latestMissing && (
+              <Alert
+                variant="warning"
+                text={t('dashboard.trend.missingMonths', { count: missingMonths.length, months: missingLabels })}
+                action={{
+                  label: t('statement.importMonth', { month: latestMissing.label }),
+                  to: getImportMonthLink(latestMissing.key),
+                }}
+              />
             )}
             labels={{
               table: t('dashboard.trend.table'),

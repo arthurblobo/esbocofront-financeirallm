@@ -9,6 +9,10 @@ export const pages = {
   settings: { to: '/configuracoes', title: 'nav.settings', icon: Settings },
 } as const
 
+export function getImportMonthLink(month: string) {
+  return { pathname: pages.import.to, search: new URLSearchParams({ month }).toString() }
+}
+
 export function getLoginDestination(state: unknown): string {
   const from = state && typeof state === 'object' && 'from' in state ? state.from : null
   return Object.values(pages).find(({ to }) => to === from)?.to ?? pages.home.to

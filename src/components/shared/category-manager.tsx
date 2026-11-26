@@ -57,7 +57,7 @@ function CategoryForm({ category, newColor, onEdit, onSave }: CategoryFormProps)
         <legend className="text-sm font-medium">{t('statement.categories.color')}</legend>
         <div className="flex flex-wrap gap-2">
           {swatches.map(([key, value]) => (
-            <label key={key} title={t(`statement.colors.${key}`)} className="relative grid size-11 cursor-pointer place-items-center rounded-md border border-input has-checked:border-primary has-focus-visible:outline-2 has-focus-visible:outline-ring">
+            <label key={key} title={t(`statement.colors.${key}`)} className="relative grid size-11 place-items-center rounded-md border border-input has-checked:border-primary has-focus-visible:outline-2 has-focus-visible:outline-ring">
               <input
                 className="sr-only"
                 type="radio"
@@ -93,7 +93,7 @@ export function CategoryManager() {
 
   return (
     <details className="rounded-lg border border-border bg-card px-4 py-3 sm:px-5">
-      <summary className="cursor-pointer rounded-sm py-2 font-semibold focus-visible:outline-2 focus-visible:outline-ring">
+      <summary className="rounded-sm py-2 font-semibold focus-visible:outline-2 focus-visible:outline-ring">
         {t('statement.categories.title')}
       </summary>
       <div className="mt-4 max-w-xl space-y-4">

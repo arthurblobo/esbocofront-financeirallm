@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import { CartesianGrid, Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
+import { useReducedMotion } from '@/lib/motion'
+
 type Point<Key extends string> = {
   key: string
   label: string
@@ -50,6 +52,7 @@ function ChartTooltip<Key extends string>({
 }
 
 export function LineChart<Key extends string>({ points, series, formatValue, formatTick, labels, note }: LineChartProps<Key>) {
+  const reducedMotion = useReducedMotion()
   const pointByKey = new Map(points.map((point) => [point.key, point]))
   const hasValues = points.some(({ values }) => series.some(({ key }) => values[key] !== null))
   const axisTick = { fill: 'var(--muted-foreground)', fontSize: 11 }
@@ -105,7 +108,7 @@ export function LineChart<Key extends string>({ points, series, formatValue, for
                       dot={{ r: 3, fill: color, stroke: 'var(--card)', strokeWidth: 1, strokeDasharray: 'none' }}
                       activeDot={{ strokeDasharray: 'none' }}
                       connectNulls={false}
-                      isAnimationActive={false}
+                      isAnimationActive={!reducedMotion} animationDuration={450}
                     />
                   ))}
                 </RechartsLineChart>
@@ -118,7 +121,7 @@ export function LineChart<Key extends string>({ points, series, formatValue, for
       )}
       {note}
       <details className="border-t border-border pt-3 text-sm">
-        <summary className="w-fit cursor-pointer rounded-sm py-1 text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring">
+        <summary className="w-fit rounded-sm py-1 text-muted-foreground focus-visible:outline-2 focus-visible:outline-ring">
           {labels.table}
         </summary>
         <table className="mt-2 w-full border-collapse text-left text-xs sm:text-sm">
